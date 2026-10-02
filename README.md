@@ -175,4 +175,5 @@ python -m pytest
 
 ## License
 
-No project license is declared yet. Add a `LICENSE` file before redistributing this repository or its derived data. OpenStreetMap-derived data and tiles have their own attribution and licensing requirements.
+MIT License
+Copyright (c) 2026 Jahnavi_Sarang_Deshkar
