@@ -1,0 +1,214 @@
+{
+  "type": "FeatureCollection",
+  "name": "pois",
+  "metadata": {
+    "source": "seed data",
+    "accuracy": "approximate; verify before operational use"
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.8553,
+          18.5196
+        ]
+      },
+      "properties": {
+        "name": "Shaniwar Wada",
+        "category": "heritage",
+        "locality": "Shaniwar Peth",
+        "source": "seed",
+        "is_seed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.879,
+          18.5133
+        ]
+      },
+      "properties": {
+        "name": "Kayani Bakery",
+        "category": "eatery",
+        "locality": "Camp",
+        "source": "seed",
+        "is_seed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.841,
+          18.5161
+        ]
+      },
+      "properties": {
+        "name": "Chitale Bandhu (Deccan)",
+        "category": "shop",
+        "locality": "Deccan Gymkhana",
+        "source": "seed",
+        "is_seed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.8554,
+          18.5126
+        ]
+      },
+      "properties": {
+        "name": "Tulshibaug",
+        "category": "market",
+        "locality": "Budhwar Peth",
+        "source": "seed",
+        "is_seed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.937,
+          18.5196
+        ]
+      },
+      "properties": {
+        "name": "Amanora Park Town",
+        "category": "society",
+        "locality": "Hadapsar",
+        "source": "seed",
+        "is_seed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.927,
+          18.5167
+        ]
+      },
+      "properties": {
+        "name": "Magarpatta City",
+        "category": "society",
+        "locality": "Hadapsar",
+        "source": "seed",
+        "is_seed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.706,
+          18.589
+        ]
+      },
+      "properties": {
+        "name": "Blue Ridge",
+        "category": "society",
+        "locality": "Hinjewadi",
+        "source": "seed",
+        "is_seed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.856,
+          18.5165
+        ]
+      },
+      "properties": {
+        "name": "Dagdusheth Halwai Ganpati Temple",
+        "category": "temple",
+        "locality": "Budhwar Peth",
+        "source": "seed",
+        "is_seed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.9015,
+          18.5527
+        ]
+      },
+      "properties": {
+        "name": "Aga Khan Palace",
+        "category": "heritage",
+        "locality": "Kalyani Nagar",
+        "source": "seed",
+        "is_seed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.7559,
+          18.3663
+        ]
+      },
+      "properties": {
+        "name": "Sinhagad Fort",
+        "category": "tourism",
+        "locality": "Sinhagad",
+        "source": "seed",
+        "is_seed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.8744,
+          18.5289
+        ]
+      },
+      "properties": {
+        "name": "Pune Railway Station",
+        "category": "transport",
+        "locality": "Sangamvadi",
+        "source": "seed",
+        "is_seed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          73.807,
+          18.4854
+        ]
+      },
+      "properties": {
+        "name": "Pune Okayama Friendship Garden",
+        "category": "park",
+        "locality": "Kothrud",
+        "source": "seed",
+        "is_seed": true
+      }
+    }
+  ]
+}

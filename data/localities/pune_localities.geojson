@@ -1,0 +1,750 @@
+{
+  "type": "FeatureCollection",
+  "name": "localities",
+  "metadata": {
+    "source": "seed data",
+    "accuracy": "approximate; verify before operational use"
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.8563,
+              18.5186
+            ],
+            [
+              73.8563,
+              18.5206
+            ],
+            [
+              73.8543,
+              18.5206
+            ],
+            [
+              73.8543,
+              18.5186
+            ],
+            [
+              73.8563,
+              18.5186
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "name": "Shaniwar Peth",
+        "category": "peth",
+        "locality": "Shaniwar Peth",
+        "source": "seed",
+        "is_seed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.84880000000001,
+              18.5079
+            ],
+            [
+              73.84880000000001,
+              18.509900000000002
+            ],
+            [
+              73.8468,
+              18.509900000000002
+            ],
+            [
+              73.8468,
+              18.5079
+            ],
+            [
+              73.84880000000001,
+              18.5079
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "name": "Sadashiv Peth",
+        "category": "peth",
+        "locality": "Sadashiv Peth",
+        "source": "seed",
+        "is_seed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.85950000000001,
+              18.5199
+            ],
+            [
+              73.85950000000001,
+              18.521900000000002
+            ],
+            [
+              73.8575,
+              18.521900000000002
+            ],
+            [
+              73.8575,
+              18.5199
+            ],
+            [
+              73.85950000000001,
+              18.5199
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "name": "Kasba Peth",
+        "category": "peth",
+        "locality": "Kasba Peth",
+        "source": "seed",
+        "is_seed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.851,
+              18.511499999999998
+            ],
+            [
+              73.851,
+              18.5135
+            ],
+            [
+              73.84899999999999,
+              18.5135
+            ],
+            [
+              73.84899999999999,
+              18.511499999999998
+            ],
+            [
+              73.851,
+              18.511499999999998
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "name": "Narayan Peth",
+        "category": "peth",
+        "locality": "Narayan Peth",
+        "source": "seed",
+        "is_seed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.8605,
+              18.514499999999998
+            ],
+            [
+              73.8605,
+              18.5165
+            ],
+            [
+              73.85849999999999,
+              18.5165
+            ],
+            [
+              73.85849999999999,
+              18.514499999999998
+            ],
+            [
+              73.8605,
+              18.514499999999998
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "name": "Raviwar Peth",
+        "category": "peth",
+        "locality": "Raviwar Peth",
+        "source": "seed",
+        "is_seed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.8554,
+              18.5157
+            ],
+            [
+              73.8554,
+              18.5177
+            ],
+            [
+              73.8534,
+              18.5177
+            ],
+            [
+              73.8534,
+              18.5157
+            ],
+            [
+              73.8554,
+              18.5157
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "name": "Budhwar Peth",
+        "category": "peth",
+        "locality": "Budhwar Peth",
+        "source": "seed",
+        "is_seed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.88000000000001,
+              18.5127
+            ],
+            [
+              73.88000000000001,
+              18.5147
+            ],
+            [
+              73.878,
+              18.5147
+            ],
+            [
+              73.878,
+              18.5127
+            ],
+            [
+              73.88000000000001,
+              18.5127
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "name": "Camp",
+        "category": "locality",
+        "locality": "Camp",
+        "source": "seed",
+        "is_seed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.84100000000001,
+              18.5154
+            ],
+            [
+              73.84100000000001,
+              18.517400000000002
+            ],
+            [
+              73.839,
+              18.517400000000002
+            ],
+            [
+              73.839,
+              18.5154
+            ],
+            [
+              73.84100000000001,
+              18.5154
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "name": "Deccan Gymkhana",
+        "category": "locality",
+        "locality": "Deccan Gymkhana",
+        "source": "seed",
+        "is_seed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.8087,
+              18.5064
+            ],
+            [
+              73.8087,
+              18.5084
+            ],
+            [
+              73.80669999999999,
+              18.5084
+            ],
+            [
+              73.80669999999999,
+              18.5064
+            ],
+            [
+              73.8087,
+              18.5064
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "name": "Kothrud",
+        "category": "locality",
+        "locality": "Kothrud",
+        "source": "seed",
+        "is_seed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.9153,
+              18.5669
+            ],
+            [
+              73.9153,
+              18.568900000000003
+            ],
+            [
+              73.91329999999999,
+              18.568900000000003
+            ],
+            [
+              73.91329999999999,
+              18.5669
+            ],
+            [
+              73.9153,
+              18.5669
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "name": "Viman Nagar",
+        "category": "locality",
+        "locality": "Viman Nagar",
+        "source": "seed",
+        "is_seed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.7399,
+              18.5903
+            ],
+            [
+              73.7399,
+              18.5923
+            ],
+            [
+              73.7379,
+              18.5923
+            ],
+            [
+              73.7379,
+              18.5903
+            ],
+            [
+              73.7399,
+              18.5903
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "name": "Hinjewadi",
+        "category": "locality",
+        "locality": "Hinjewadi",
+        "source": "seed",
+        "is_seed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.927,
+              18.5079
+            ],
+            [
+              73.927,
+              18.509900000000002
+            ],
+            [
+              73.925,
+              18.509900000000002
+            ],
+            [
+              73.925,
+              18.5079
+            ],
+            [
+              73.927,
+              18.5079
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "name": "Hadapsar",
+        "category": "locality",
+        "locality": "Hadapsar",
+        "source": "seed",
+        "is_seed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.8949,
+              18.5352
+            ],
+            [
+              73.8949,
+              18.537200000000002
+            ],
+            [
+              73.8929,
+              18.537200000000002
+            ],
+            [
+              73.8929,
+              18.5352
+            ],
+            [
+              73.8949,
+              18.5352
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "name": "Koregaon Park",
+        "category": "locality",
+        "locality": "Koregaon Park",
+        "source": "seed",
+        "is_seed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.8087,
+              18.558
+            ],
+            [
+              73.8087,
+              18.560000000000002
+            ],
+            [
+              73.80669999999999,
+              18.560000000000002
+            ],
+            [
+              73.80669999999999,
+              18.558
+            ],
+            [
+              73.8087,
+              18.558
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "name": "Aundh",
+        "category": "locality",
+        "locality": "Aundh",
+        "source": "seed",
+        "is_seed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.7878,
+              18.558
+            ],
+            [
+              73.7878,
+              18.560000000000002
+            ],
+            [
+              73.7858,
+              18.560000000000002
+            ],
+            [
+              73.7858,
+              18.558
+            ],
+            [
+              73.7878,
+              18.558
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "name": "Baner",
+        "category": "locality",
+        "locality": "Baner",
+        "source": "seed",
+        "is_seed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.76350000000001,
+              18.598499999999998
+            ],
+            [
+              73.76350000000001,
+              18.6005
+            ],
+            [
+              73.7615,
+              18.6005
+            ],
+            [
+              73.7615,
+              18.598499999999998
+            ],
+            [
+              73.76350000000001,
+              18.598499999999998
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "name": "Wakad",
+        "category": "locality",
+        "locality": "Wakad",
+        "source": "seed",
+        "is_seed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.8007,
+              18.6288
+            ],
+            [
+              73.8007,
+              18.6308
+            ],
+            [
+              73.7987,
+              18.6308
+            ],
+            [
+              73.7987,
+              18.6288
+            ],
+            [
+              73.8007,
+              18.6288
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "name": "Pimpri",
+        "category": "locality",
+        "locality": "Pimpri",
+        "source": "seed",
+        "is_seed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.8007,
+              18.639499999999998
+            ],
+            [
+              73.8007,
+              18.6415
+            ],
+            [
+              73.7987,
+              18.6415
+            ],
+            [
+              73.7987,
+              18.639499999999998
+            ],
+            [
+              73.8007,
+              18.639499999999998
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "name": "Chinchwad",
+        "category": "locality",
+        "locality": "Chinchwad",
+        "source": "seed",
+        "is_seed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.85770000000001,
+              18.519399999999997
+            ],
+            [
+              73.85770000000001,
+              18.5214
+            ],
+            [
+              73.8557,
+              18.5214
+            ],
+            [
+              73.8557,
+              18.519399999999997
+            ],
+            [
+              73.85770000000001,
+              18.519399999999997
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "name": "Pune Municipal Corporation",
+        "category": "boundary",
+        "locality": "Pune",
+        "source": "seed",
+        "is_seed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.8007,
+              18.6288
+            ],
+            [
+              73.8007,
+              18.6308
+            ],
+            [
+              73.7987,
+              18.6308
+            ],
+            [
+              73.7987,
+              18.6288
+            ],
+            [
+              73.8007,
+              18.6288
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "name": "Pimpri-Chinchwad Municipal Corporation",
+        "category": "boundary",
+        "locality": "Pimpri-Chinchwad",
+        "source": "seed",
+        "is_seed": true
+      }
+    }
+  ]
+}

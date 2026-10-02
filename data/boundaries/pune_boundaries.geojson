@@ -1,0 +1,84 @@
+{
+  "type": "FeatureCollection",
+  "name": "boundaries",
+  "metadata": {
+    "source": "seed data",
+    "accuracy": "approximate; verify before operational use"
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.85770000000001,
+              18.519399999999997
+            ],
+            [
+              73.85770000000001,
+              18.5214
+            ],
+            [
+              73.8557,
+              18.5214
+            ],
+            [
+              73.8557,
+              18.519399999999997
+            ],
+            [
+              73.85770000000001,
+              18.519399999999997
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "name": "Pune Municipal Corporation",
+        "category": "boundary",
+        "locality": "Pune",
+        "source": "seed",
+        "is_seed": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              73.8007,
+              18.6288
+            ],
+            [
+              73.8007,
+              18.6308
+            ],
+            [
+              73.7987,
+              18.6308
+            ],
+            [
+              73.7987,
+              18.6288
+            ],
+            [
+              73.8007,
+              18.6288
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "name": "Pimpri-Chinchwad Municipal Corporation",
+        "category": "boundary",
+        "locality": "Pimpri-Chinchwad",
+        "source": "seed",
+        "is_seed": true
+      }
+    }
+  ]
+}
