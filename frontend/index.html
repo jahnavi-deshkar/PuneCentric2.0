@@ -4,67 +4,86 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#f4f1e9" />
-    <meta
-      name="description"
-      content="Explore walking, bus, metro, and auto-rickshaw journeys across Pune."
-    />
+    <meta name="description" content="Choose places and explore Pune on an interactive map." />
     <title>PuneCentric — Pune Multimodal Route Explorer</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <link rel="stylesheet" href="/css/style.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="/js/map.js" defer></script>
+    <script src="/js/search.js" defer></script>
     <script src="/js/app.js" defer></script>
   </head>
-  <body>
-    <main class="page-shell">
-      <header class="topbar" aria-label="PuneCentric">
+  <body class="map-page">
+    <main class="map-experience">
+      <div id="map" role="application" aria-label="Interactive map of Pune"></div>
+
+      <header class="map-header">
         <a class="wordmark" href="/" aria-label="PuneCentric home">
           <span class="wordmark-mark" aria-hidden="true">P</span>
           <span>PuneCentric</span>
         </a>
-        <span class="edition">PUNE · INDIA</span>
-      </header>
-
-      <section class="hero" aria-labelledby="page-title">
-        <div class="hero-copy">
-          <p class="eyebrow"><span class="eyebrow-line"></span> THE CITY, CONNECTED</p>
-          <h1 id="page-title">Pune, <em>your way.</em></h1>
-          <p class="intro">
-            A clearer way to move through the city. Compare journeys across
-            walking, buses, metro, and auto-rickshaws—all in one place.
-          </p>
-          <div class="service-note">
+        <div class="header-meta">
+          <span class="edition">PUNE · INDIA</span>
+          <span class="service-note" data-state="loading">
             <span class="status-dot" aria-hidden="true"></span>
             <span id="health-status" role="status" aria-live="polite">Checking service…</span>
+          </span>
+        </div>
+      </header>
+
+      <section class="control-panel" aria-labelledby="panel-title">
+        <div class="panel-heading">
+          <p class="eyebrow"><span class="eyebrow-line"></span> THE CITY, CONNECTED</p>
+          <h1 id="panel-title">Where to, <em>Pune?</em></h1>
+          <p class="panel-intro">Choose two places to start exploring your journey.</p>
+        </div>
+
+        <div class="search-fields">
+          <div class="search-field" data-search-field="origin">
+            <span class="field-marker marker-origin" aria-hidden="true"></span>
+            <label class="sr-only" for="origin-input">Starting point</label>
+            <input id="origin-input" type="search" placeholder="Starting point" autocomplete="off" aria-autocomplete="list" aria-controls="origin-suggestions" />
+            <button class="clear-input" type="button" aria-label="Clear starting point" hidden>×</button>
+            <ul id="origin-suggestions" class="suggestions" role="listbox" aria-label="Starting point suggestions" hidden></ul>
+          </div>
+
+          <div class="field-connector" aria-hidden="true"><span></span></div>
+
+          <div class="search-field" data-search-field="destination">
+            <span class="field-marker marker-destination" aria-hidden="true"></span>
+            <label class="sr-only" for="destination-input">Destination</label>
+            <input id="destination-input" type="search" placeholder="Where do you want to go?" autocomplete="off" aria-autocomplete="list" aria-controls="destination-suggestions" />
+            <button class="clear-input" type="button" aria-label="Clear destination" hidden>×</button>
+            <ul id="destination-suggestions" class="suggestions" role="listbox" aria-label="Destination suggestions" hidden></ul>
           </div>
         </div>
 
-        <aside class="city-card" aria-label="About PuneCentric">
-          <div class="card-topline">
-            <span>BUILT FOR PUNE</span>
-            <span class="card-index">01 / 04</span>
-          </div>
-          <div class="route-art" aria-hidden="true">
-            <span class="route-ring ring-one"></span>
-            <span class="route-ring ring-two"></span>
-            <span class="route-path"></span>
-            <span class="route-stop stop-one"></span>
-            <span class="route-stop stop-two"></span>
-            <span class="route-label label-one">DECCAN</span>
-            <span class="route-label label-two">CAMP</span>
-            <span class="route-center">पुणे</span>
-          </div>
-          <p class="card-caption">Many ways across one city.</p>
-        </aside>
-      </section>
+        <div class="panel-actions">
+          <button class="swap-button" id="swap-button" type="button" aria-label="Swap starting point and destination" title="Swap places">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 6h10M12 3l3 3-3 3M15 14H5m3-3-3 3 3 3" /></svg>
+            <span>Swap</span>
+          </button>
+          <span class="action-divider" aria-hidden="true"></span>
+          <button class="quick-button" id="use-location" type="button">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="5.5" /><path d="M10 1.5v3M10 15.5v3M1.5 10h3m11 0h3" /></svg>
+            <span>Use my location</span>
+          </button>
+          <button class="quick-button map-pick-button" id="map-pick" type="button" aria-pressed="false">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m2 5 5-2 6 2 5-2v12l-5 2-6-2-5 2zM7 3v12m6-10v12" /></svg>
+            <span>Pick on map</span>
+          </button>
+        </div>
 
-      <footer class="footer">
-        <span>WALK · RIDE · ARRIVE</span>
-        <span>ROUTES THAT MOVE WITH YOU</span>
-      </footer>
+        <div class="selection-status" aria-label="Selected places">
+          <span class="selection-chip" id="origin-chip"><span class="chip-dot origin-dot"></span><span id="origin-chip-label">Choose a starting point</span></span>
+          <span class="selection-chip" id="destination-chip"><span class="chip-dot destination-dot"></span><span id="destination-chip-label">Choose a destination</span></span>
+        </div>
+
+        <p class="panel-hint" id="map-hint" aria-live="polite">Search for a place or choose “Pick on map”.</p>
+      </section>
     </main>
   </body>
 </html>
