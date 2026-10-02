@@ -1,0 +1,16 @@
+# Runtime
+fastapi>=0.115,<1.0
+uvicorn[standard]>=0.30,<1.0
+pydantic>=2.8,<3.0
+
+# GIS, transport networks, and data processing
+networkx>=3.3,<4.0
+osmnx>=2.0,<3.0
+geopandas>=1.0,<2.0
+shapely>=2.0,<3.0
+pandas>=2.2,<4.0
+numpy>=1.26,<3.0
+
+# Development and API checks
+pytest>=8.3,<9.0
+requests>=2.32,<3.0
