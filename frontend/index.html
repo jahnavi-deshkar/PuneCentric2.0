@@ -14,6 +14,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="/js/map.js" defer></script>
     <script src="/js/search.js" defer></script>
+    <script src="/js/routes.js" defer></script>
     <script src="/js/app.js" defer></script>
   </head>
   <body class="map-page">
@@ -39,6 +40,11 @@
           <p class="eyebrow"><span class="eyebrow-line"></span> THE CITY, CONNECTED</p>
           <h1 id="panel-title">Where to, <em>Pune?</em></h1>
           <p class="panel-intro">Choose two places to start exploring your journey.</p>
+        </div>
+
+        <div class="mode-tabs" role="tablist" aria-label="Travel mode">
+          <button class="mode-tab is-active" type="button" role="tab" id="walking-tab" aria-selected="true" aria-controls="route-summary" data-mode="walking">Walking</button>
+          <button class="mode-tab" type="button" role="tab" id="bus-tab" aria-selected="false" aria-controls="route-summary" data-mode="bus">Bus</button>
         </div>
 
         <div class="search-fields">

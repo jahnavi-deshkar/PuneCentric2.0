@@ -1,0 +1,379 @@
+{
+  "source": "seed",
+  "approximate": true,
+  "notice": "Approximate stop coordinates and corridor sequences for development; not verified PMPML timetable or operational data.",
+  "routes": [
+    {
+      "route_id": "seed-route-1-out",
+      "route_name": "Route 1 · Swargate ↔ Katraj",
+      "stops": [
+        {
+          "id": "seed-swargate",
+          "name": "Swargate",
+          "lat": 18.5018,
+          "lng": 73.8636
+        },
+        {
+          "id": "seed-laxmi-narayan",
+          "name": "Laxmi Narayan",
+          "lat": 18.4949,
+          "lng": 73.8614
+        },
+        {
+          "id": "seed-padmavati",
+          "name": "Padmavati",
+          "lat": 18.479,
+          "lng": 73.862
+        },
+        {
+          "id": "seed-bharati-vidyapeeth",
+          "name": "Bharati Vidyapeeth",
+          "lat": 18.4606,
+          "lng": 73.8574
+        },
+        {
+          "id": "seed-katraj",
+          "name": "Katraj",
+          "lat": 18.4575,
+          "lng": 73.8675
+        }
+      ]
+    },
+    {
+      "route_id": "seed-route-1-return",
+      "route_name": "Route 1 · Swargate ↔ Katraj",
+      "stops": [
+        {
+          "id": "seed-katraj",
+          "name": "Katraj",
+          "lat": 18.4575,
+          "lng": 73.8675
+        },
+        {
+          "id": "seed-bharati-vidyapeeth",
+          "name": "Bharati Vidyapeeth",
+          "lat": 18.4606,
+          "lng": 73.8574
+        },
+        {
+          "id": "seed-padmavati",
+          "name": "Padmavati",
+          "lat": 18.479,
+          "lng": 73.862
+        },
+        {
+          "id": "seed-laxmi-narayan",
+          "name": "Laxmi Narayan",
+          "lat": 18.4949,
+          "lng": 73.8614
+        },
+        {
+          "id": "seed-swargate",
+          "name": "Swargate",
+          "lat": 18.5018,
+          "lng": 73.8636
+        }
+      ]
+    },
+    {
+      "route_id": "seed-route-2-out",
+      "route_name": "Route 2 · Kothrud Depot ↔ Pune Station",
+      "stops": [
+        {
+          "id": "seed-kothrud-depot",
+          "name": "Kothrud Depot",
+          "lat": 18.5071,
+          "lng": 73.8072
+        },
+        {
+          "id": "seed-karve-nagar",
+          "name": "Karve Nagar",
+          "lat": 18.4898,
+          "lng": 73.819
+        },
+        {
+          "id": "seed-deccan-gymkhana",
+          "name": "Deccan Gymkhana",
+          "lat": 18.5164,
+          "lng": 73.84
+        },
+        {
+          "id": "seed-pmc",
+          "name": "PMC",
+          "lat": 18.5204,
+          "lng": 73.8567
+        },
+        {
+          "id": "seed-pune-station",
+          "name": "Pune Station",
+          "lat": 18.5289,
+          "lng": 73.8744
+        }
+      ]
+    },
+    {
+      "route_id": "seed-route-2-return",
+      "route_name": "Route 2 · Kothrud Depot ↔ Pune Station",
+      "stops": [
+        {
+          "id": "seed-pune-station",
+          "name": "Pune Station",
+          "lat": 18.5289,
+          "lng": 73.8744
+        },
+        {
+          "id": "seed-pmc",
+          "name": "PMC",
+          "lat": 18.5204,
+          "lng": 73.8567
+        },
+        {
+          "id": "seed-deccan-gymkhana",
+          "name": "Deccan Gymkhana",
+          "lat": 18.5164,
+          "lng": 73.84
+        },
+        {
+          "id": "seed-karve-nagar",
+          "name": "Karve Nagar",
+          "lat": 18.4898,
+          "lng": 73.819
+        },
+        {
+          "id": "seed-kothrud-depot",
+          "name": "Kothrud Depot",
+          "lat": 18.5071,
+          "lng": 73.8072
+        }
+      ]
+    },
+    {
+      "route_id": "seed-route-3-out",
+      "route_name": "Route 3 · Hadapsar ↔ Deccan Gymkhana",
+      "stops": [
+        {
+          "id": "seed-hadapsar",
+          "name": "Hadapsar",
+          "lat": 18.5089,
+          "lng": 73.926
+        },
+        {
+          "id": "seed-magarpatta",
+          "name": "Magarpatta",
+          "lat": 18.5167,
+          "lng": 73.927
+        },
+        {
+          "id": "seed-racecourse",
+          "name": "Racecourse",
+          "lat": 18.4917,
+          "lng": 73.8941
+        },
+        {
+          "id": "seed-swargate",
+          "name": "Swargate",
+          "lat": 18.5018,
+          "lng": 73.8636
+        },
+        {
+          "id": "seed-deccan",
+          "name": "Deccan",
+          "lat": 18.5164,
+          "lng": 73.84
+        }
+      ]
+    },
+    {
+      "route_id": "seed-route-3-return",
+      "route_name": "Route 3 · Hadapsar ↔ Deccan Gymkhana",
+      "stops": [
+        {
+          "id": "seed-deccan",
+          "name": "Deccan",
+          "lat": 18.5164,
+          "lng": 73.84
+        },
+        {
+          "id": "seed-swargate",
+          "name": "Swargate",
+          "lat": 18.5018,
+          "lng": 73.8636
+        },
+        {
+          "id": "seed-racecourse",
+          "name": "Racecourse",
+          "lat": 18.4917,
+          "lng": 73.8941
+        },
+        {
+          "id": "seed-magarpatta",
+          "name": "Magarpatta",
+          "lat": 18.5167,
+          "lng": 73.927
+        },
+        {
+          "id": "seed-hadapsar",
+          "name": "Hadapsar",
+          "lat": 18.5089,
+          "lng": 73.926
+        }
+      ]
+    },
+    {
+      "route_id": "seed-route-4-out",
+      "route_name": "Route 4 · Hinjewadi Phase 3 ↔ PMC",
+      "stops": [
+        {
+          "id": "seed-hinjewadi-phase-3",
+          "name": "Hinjewadi Phase 3",
+          "lat": 18.5913,
+          "lng": 73.7389
+        },
+        {
+          "id": "seed-waje",
+          "name": "Waje",
+          "lat": 18.583,
+          "lng": 73.751
+        },
+        {
+          "id": "seed-chandani-chowk",
+          "name": "Chandani Chowk",
+          "lat": 18.5076,
+          "lng": 73.7775
+        },
+        {
+          "id": "seed-university-circle",
+          "name": "University Circle",
+          "lat": 18.5362,
+          "lng": 73.8297
+        },
+        {
+          "id": "seed-shivajinagar",
+          "name": "Shivajinagar",
+          "lat": 18.5308,
+          "lng": 73.8475
+        },
+        {
+          "id": "seed-pmc",
+          "name": "PMC",
+          "lat": 18.5204,
+          "lng": 73.8567
+        }
+      ]
+    },
+    {
+      "route_id": "seed-route-4-return",
+      "route_name": "Route 4 · Hinjewadi Phase 3 ↔ PMC",
+      "stops": [
+        {
+          "id": "seed-pmc",
+          "name": "PMC",
+          "lat": 18.5204,
+          "lng": 73.8567
+        },
+        {
+          "id": "seed-shivajinagar",
+          "name": "Shivajinagar",
+          "lat": 18.5308,
+          "lng": 73.8475
+        },
+        {
+          "id": "seed-university-circle",
+          "name": "University Circle",
+          "lat": 18.5362,
+          "lng": 73.8297
+        },
+        {
+          "id": "seed-chandani-chowk",
+          "name": "Chandani Chowk",
+          "lat": 18.5076,
+          "lng": 73.7775
+        },
+        {
+          "id": "seed-waje",
+          "name": "Waje",
+          "lat": 18.583,
+          "lng": 73.751
+        },
+        {
+          "id": "seed-hinjewadi-phase-3",
+          "name": "Hinjewadi Phase 3",
+          "lat": 18.5913,
+          "lng": 73.7389
+        }
+      ]
+    },
+    {
+      "route_id": "seed-route-5-out",
+      "route_name": "Route 5 · Viman Nagar ↔ Swargate",
+      "stops": [
+        {
+          "id": "seed-viman-nagar",
+          "name": "Viman Nagar",
+          "lat": 18.5679,
+          "lng": 73.9143
+        },
+        {
+          "id": "seed-yerwada",
+          "name": "Yerwada",
+          "lat": 18.5471,
+          "lng": 73.8787
+        },
+        {
+          "id": "seed-bund-garden",
+          "name": "Bund Garden",
+          "lat": 18.5362,
+          "lng": 73.8833
+        },
+        {
+          "id": "seed-pune-station",
+          "name": "Pune Station",
+          "lat": 18.5289,
+          "lng": 73.8744
+        },
+        {
+          "id": "seed-swargate",
+          "name": "Swargate",
+          "lat": 18.5018,
+          "lng": 73.8636
+        }
+      ]
+    },
+    {
+      "route_id": "seed-route-5-return",
+      "route_name": "Route 5 · Viman Nagar ↔ Swargate",
+      "stops": [
+        {
+          "id": "seed-swargate",
+          "name": "Swargate",
+          "lat": 18.5018,
+          "lng": 73.8636
+        },
+        {
+          "id": "seed-pune-station",
+          "name": "Pune Station",
+          "lat": 18.5289,
+          "lng": 73.8744
+        },
+        {
+          "id": "seed-bund-garden",
+          "name": "Bund Garden",
+          "lat": 18.5362,
+          "lng": 73.8833
+        },
+        {
+          "id": "seed-yerwada",
+          "name": "Yerwada",
+          "lat": 18.5471,
+          "lng": 73.8787
+        },
+        {
+          "id": "seed-viman-nagar",
+          "name": "Viman Nagar",
+          "lat": 18.5679,
+          "lng": 73.9143
+        }
+      ]
+    }
+  ]
+}

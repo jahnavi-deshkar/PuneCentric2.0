@@ -14,6 +14,7 @@
     destination: null,
     activeSelectionMode: null,
     nextMapMode: "origin",
+    activeMode: "walking",
     regions: [],
   };
 
@@ -30,6 +31,7 @@
   };
   const summary = document.createElement("aside");
   summary.className = "route-summary";
+  summary.id = "route-summary";
   summary.setAttribute("aria-live", "polite");
   summary.setAttribute("aria-label", "Walking route summary");
   summary.hidden = true;
@@ -74,54 +76,30 @@
     searchControls.setValue(key, place?.name || "");
     updateChips();
     drawMarkers({ fit });
-    refreshWalkingRoute();
+    refreshActiveRoute();
     if (message) setHint(message);
     else if (state.origin && state.destination) setHint("Both places are set. You can change either pin or swap them.");
     else if (place) setHint(`${key === "origin" ? "Starting point" : "Destination"} set. Choose the other place to complete your pair.`);
     else setHint("Search for a place or choose “Pick on map”.");
   }
 
-  function formatDistance(kilometers) {
-    const value = Number(kilometers);
-    return value < 1 ? `${Math.round(value * 1000)} m` : `${value.toFixed(2)} km`;
-  }
-
   function showRouteLoading() {
     summary.hidden = false;
-    summary.innerHTML = `<div class="route-summary-head"><div><p class="route-summary-kicker">Walking route</p><h2 class="route-summary-title">Finding your way</h2><p class="route-summary-caption">Calculating distance and time…</p></div><span class="route-summary-loader" aria-hidden="true">···</span></div>`;
+    const title = document.createElement("h2");
+    title.className = "route-summary-title";
+    title.textContent = "Finding your way";
+    const caption = document.createElement("p");
+    caption.className = "route-summary-caption";
+    caption.textContent = `Calculating ${state.activeMode} route…`;
+    summary.replaceChildren(title, caption);
   }
 
-  function renderRouteSummary(route) {
-    const distance = formatDistance(route.total_distance_km);
-    const duration = `${Math.max(0, Math.round(route.total_duration_min))} min`;
-    summary.innerHTML = `
-      <div class="route-summary-head">
-        <div>
-          <p class="route-summary-kicker">Walking · estimate</p>
-          <h2 class="route-summary-title">Your route</h2>
-          <p class="route-summary-caption">At an average pace of 4.5 km/h</p>
-        </div>
-      </div>
-      <div class="route-summary-metrics">
-        <div><span class="route-metric-label">Distance</span><span class="route-metric-value">${distance}</span></div>
-        <div><span class="route-metric-label">Duration</span><span class="route-metric-value">${duration}</span></div>
-        <div><span class="route-metric-label">Fare</span><span class="route-metric-value">₹0</span></div>
-        <div><span class="route-metric-label">Carbon</span><span class="route-metric-value">0 g CO₂</span></div>
-      </div>`;
-    summary.hidden = false;
-  }
-
-  function showRouteError() {
-    summary.innerHTML = `<div class="route-summary-head"><div><p class="route-summary-kicker">Walking route</p><h2 class="route-summary-title">Route unavailable</h2><p class="route-summary-caption">The route service could not calculate this journey.</p></div></div>`;
-    summary.hidden = false;
-  }
-
-  async function refreshWalkingRoute() {
+  async function refreshActiveRoute() {
     routeController?.abort();
     routeController = null;
     routeRequestId += 1;
     const currentRequestId = routeRequestId;
-    window.PuneMap.clearRoutes();
+    window.PuneRoutes.clearMapRoutes();
     const origin = coordinatesOf(state.origin);
     const destination = coordinatesOf(state.destination);
     if (!origin || !destination) {
@@ -132,26 +110,19 @@
     routeController = new AbortController();
     showRouteLoading();
     try {
-      const response = await fetch("/api/routes/walking", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({
-          origin: { ...origin, label: state.origin.name },
-          destination: { ...destination, label: state.destination.name },
-        }),
-        signal: routeController.signal,
-      });
-      if (!response.ok) throw new Error(`Walking route request failed (${response.status})`);
-      const route = await response.json();
+      const route = await window.PuneRoutes.fetchRoute(
+        state.activeMode,
+        { ...origin, label: state.origin.name },
+        { ...destination, label: state.destination.name },
+        routeController.signal,
+      );
       if (currentRequestId !== routeRequestId) return;
-      const leg = route.legs?.find((item) => item.mode === "walking") || route.legs?.[0];
-      if (!leg?.geometry?.length) throw new Error("The route response did not include geometry");
-      window.PuneMap.renderRoutePolyline(leg.geometry, "#47674d");
-      renderRouteSummary(route);
+      window.PuneRoutes.renderMap(route);
+      window.PuneRoutes.renderSummary(route, state.activeMode, summary);
     } catch (error) {
       if (error.name === "AbortError" || currentRequestId !== routeRequestId) return;
-      window.PuneMap.clearRoutes();
-      showRouteError();
+      window.PuneRoutes.clearMapRoutes();
+      window.PuneRoutes.renderError(summary, error, state.activeMode);
     }
   }
 
@@ -200,7 +171,7 @@
     searchControls.setValue("destination", state.destination?.name || "");
     updateChips();
     drawMarkers();
-    refreshWalkingRoute();
+    refreshActiveRoute();
     setHint(state.origin && state.destination ? "Starting point and destination swapped." : "Places swapped. Choose the missing point to complete your pair.");
   });
 
@@ -213,6 +184,20 @@
       return;
     }
     startMapSelection(state.nextMapMode);
+  });
+
+  document.querySelectorAll(".mode-tab").forEach((button) => {
+    button.addEventListener("click", () => {
+      const mode = button.dataset.mode;
+      if (mode !== "walking" && mode !== "bus") return;
+      state.activeMode = mode;
+      document.querySelectorAll(".mode-tab").forEach((tab) => {
+        const active = tab === button;
+        tab.classList.toggle("is-active", active);
+        tab.setAttribute("aria-selected", String(active));
+      });
+      refreshActiveRoute();
+    });
   });
 
   elements.currentLocation.addEventListener("click", () => {

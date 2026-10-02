@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict, Field
+from app.models.transit import BusStop
 
 
 class LocationPoint(BaseModel):
@@ -27,6 +28,9 @@ class RouteLeg(BaseModel):
     fare_inr: float = Field(ge=0)
     co2_grams: float = Field(ge=0)
     geometry: list[list[float]]
+    route_name: str | None = None
+    board_stop: BusStop | None = None
+    alight_stop: BusStop | None = None
 
 
 class RouteResponse(BaseModel):

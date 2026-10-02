@@ -43,6 +43,11 @@ button { color: inherit; }
 h1 { margin: 0; font-family: var(--serif); font-size: 34px; font-weight: 500; letter-spacing: -0.055em; line-height: 1.1; }
 h1 em { color: var(--green); font-weight: 500; }
 .panel-intro { margin: 8px 0 0; color: #73766e; font-size: 12px; line-height: 1.55; }
+.mode-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin: 16px 0 13px; padding: 4px; border: 1px solid #e4e2d9; border-radius: 5px; background: #f0efe8; }
+.mode-tab { min-height: 32px; border: 0; border-radius: 3px; background: transparent; color: #777a71; cursor: pointer; font-size: 11px; font-weight: 600; transition: color 150ms ease, background 150ms ease, box-shadow 150ms ease; }
+.mode-tab:hover { color: var(--green-dark); }
+.mode-tab.is-active { background: #fffefa; color: var(--green-dark); box-shadow: 0 1px 4px #25291e13; }
+.mode-tab:focus-visible { outline: 2px solid #6f8d72; outline-offset: 2px; }
 
 .search-fields { position: relative; display: grid; gap: 9px; }
 .search-field { position: relative; height: 49px; display: flex; align-items: center; gap: 11px; padding: 0 12px; border: 1px solid #e1dfd6; border-radius: 4px; background: #fffefa; transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease; }
@@ -66,6 +71,10 @@ h1 em { color: var(--green); font-weight: 500; }
 .suggestion-locality { grid-column: 1; color: #85877e; font-size: 10px; }
 .category-tag { grid-column: 2; grid-row: 1 / span 2; align-self: center; padding: 4px 7px; border-radius: 999px; background: #eff1eb; color: #65705f; font-size: 9px; font-weight: 600; text-transform: capitalize; }
 .suggestion-message { padding: 11px; color: #81847a; font-size: 11px; line-height: 1.5; }
+.bus-route-details { display: grid; gap: 6px; margin: 13px 0 0; padding: 11px 0 0; border-top: 1px solid #e7e5dc; }
+.bus-route-details > div { display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 8px; align-items: baseline; }
+.bus-route-details dt { color: #85877e; font-size: 9px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
+.bus-route-details dd { min-width: 0; margin: 0; color: #3d463d; font-size: 10px; font-weight: 600; line-height: 1.35; }
 
 .panel-actions { display: flex; align-items: center; gap: 9px; margin-top: 15px; }
 .swap-button, .quick-button { min-height: 34px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 9px; border: 1px solid transparent; border-radius: 4px; background: transparent; color: #5c6259; cursor: pointer; font-size: 10px; font-weight: 600; white-space: nowrap; transition: background 150ms ease, border-color 150ms ease, color 150ms ease, transform 150ms ease; }
@@ -107,6 +116,7 @@ h1 em { color: var(--green); font-weight: 500; }
   .eyebrow { margin-bottom: 8px; }
   h1 { font-size: 29px; }
   .panel-intro { margin-top: 5px; font-size: 11px; }
+  .mode-tabs { margin: 11px 0 10px; }
   .search-field { height: 46px; }
   .panel-actions { flex-wrap: wrap; gap: 5px; margin-top: 10px; }
   .swap-button, .quick-button { min-height: 32px; padding: 0 6px; font-size: 9px; }
