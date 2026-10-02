@@ -10,6 +10,7 @@ from typing import Any
 import networkx as nx
 
 from app.calculations.distance import haversine_distance_meters, polyline_distance_meters
+from app.calculations.fares import FareEngine, fare_engine
 from app.models.route import LocationPoint, RouteLeg, RouteRequest, RouteResponse
 from app.models.transit import MetroLeg, MetroLine, MetroStation
 from app.transport.walking import WALKING_SPEED_KMH, WalkingRouter, walking_router
@@ -32,10 +33,12 @@ class MetroRouter:
         network_path: Path | str = NETWORK_PATH,
         walking: WalkingRouter | None = None,
         access_radius_meters: float = ACCESS_RADIUS_METERS,
+        fares: FareEngine | None = None,
     ) -> None:
         self.network_path = Path(network_path)
         self.walking = walking or walking_router
         self.access_radius_meters = access_radius_meters
+        self.fares = fares or fare_engine
         self.stations: dict[str, MetroStation] = {}
         self.lines: dict[str, MetroLine] = {}
         self.graph = nx.Graph()
@@ -75,16 +78,6 @@ class MetroRouter:
             line_nodes = [(line_id, station_id) for line_id, line in self.lines.items() if station_id in line.route_sequence]
             for first, second in zip(line_nodes, line_nodes[1:]):
                 self.graph.add_edge(first, second, distance_m=0.0, transfer=True, station_id=station_id)
-
-    @staticmethod
-    def _fare(distance_km: float) -> float:
-        if distance_km <= 2:
-            return 10.0
-        if distance_km <= 6:
-            return 20.0
-        if distance_km <= 12:
-            return 30.0
-        return 35.0
 
     def _nearby_nodes(self, point: LocationPoint) -> list[tuple[float, tuple[str, str]]]:
         point_coords = (point.lat, point.lng)
@@ -158,7 +151,14 @@ class MetroRouter:
                     best = (key, path, origin_walk_m, destination_walk_m)
         return (best[1], best[2], best[3]) if best else None
 
-    def route(self, request: RouteRequest) -> RouteResponse:
+    def route(
+        self,
+        request: RouteRequest,
+        *,
+        weekend_discount: bool = False,
+        student_discount: bool = False,
+        student_discount_rate: float | None = None,
+    ) -> RouteResponse:
         """Return walking access/egress plus line and interchange legs."""
         selected = self._select_path(request)
         if selected is None:
@@ -169,7 +169,13 @@ class MetroRouter:
         parts = self._journey_parts(path)
         metro_parts = [part for part in parts if part["type"] == "metro"]
         transit_distance_km = sum(self._part_distance_km(part) for part in metro_parts)
-        fare = self._fare(transit_distance_km)
+        fare_breakdown = self.fares.metro(
+            transit_distance_km,
+            weekend=weekend_discount,
+            student=student_discount,
+            student_discount_rate=student_discount_rate,
+        )
+        fare = fare_breakdown.total_fare
 
         first_station = self.stations[path[0][1]]
         last_station = self.stations[path[-1][1]]
@@ -185,6 +191,7 @@ class MetroRouter:
         legs: list[RouteLeg] = [RouteLeg(
             mode="walking", distance_km=walk_to.distance_km, duration_min=walk_to.duration_min,
             fare_inr=0.0, co2_grams=0.0, geometry=walk_to.geometry,
+            fare_breakdown=walk_to.fare_breakdown or self.fares.walking(),
         )]
         rail_legs: list[RouteLeg] = []
         for part in parts:
@@ -205,6 +212,7 @@ class MetroRouter:
         if rail_legs:
             # One through journey fare is charged at boarding and reported once.
             rail_legs[0].fare_inr = fare
+            rail_legs[0].fare_breakdown = fare_breakdown
         rail_iterator = iter(rail_legs)
         # Reconstruct original transit ordering, keeping each interchange between
         # its two colored rail legs.
@@ -218,10 +226,12 @@ class MetroRouter:
                 legs.append(RouteLeg(
                     mode="transfer", distance_km=0.0, duration_min=INTERCHANGE_PENALTY_MINUTES,
                     fare_inr=0.0, co2_grams=0.0, geometry=[], transfer_station=station,
+                    fare_breakdown=self.fares.zero("transfer"),
                 ))
         legs.append(RouteLeg(
             mode="walking", distance_km=walk_from.distance_km, duration_min=walk_from.duration_min,
             fare_inr=0.0, co2_grams=0.0, geometry=walk_from.geometry,
+            fare_breakdown=walk_from.fare_breakdown or self.fares.walking(),
         ))
         return RouteResponse(
             mode="metro",
@@ -230,6 +240,9 @@ class MetroRouter:
             total_fare_inr=fare,
             total_co2_grams=round(sum(leg.co2_grams for leg in legs), 1),
             legs=legs,
+            fare_breakdown=self.fares.combine(
+                [leg.fare_breakdown or self.fares.zero(leg.mode) for leg in legs], mode="metro"
+            ),
         )
 
 

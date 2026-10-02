@@ -91,7 +91,9 @@ h1 em { color: var(--green); font-weight: 500; }
 .candidate-list { display: grid; gap: 8px; max-height: min(63vh, 620px); margin-top: 12px; overflow-y: auto; padding: 1px 3px 3px 1px; }
 .candidate-card { width: 100%; padding: 11px 12px 10px; border: 1px solid #e2dfd5; border-radius: 5px; background: #fffefa; color: var(--ink); text-align: left; cursor: pointer; transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease; }
 .candidate-card:hover { transform: translateY(-1px); border-color: #bdc9b9; box-shadow: 0 5px 16px #25291e12; }
-.candidate-card:focus-visible { outline: 2px solid #6f8d72; outline-offset: 2px; }
+.candidate-select { flex: 0 0 auto; padding: 4px 7px; border: 1px solid #e2e2d8; border-radius: 4px; background: transparent; color: #5b6859; cursor: pointer; font-size: 8px; font-weight: 700; }
+.candidate-select:hover, .candidate-select[aria-pressed="true"] { border-color: #a8baa4; background: #eaf0e8; color: #34543c; }
+.candidate-select:focus-visible { outline: 2px solid #6f8d72; outline-offset: 2px; }
 .candidate-card.is-selected { border-color: #6f8d72; box-shadow: 0 0 0 2px #47674d16; }
 .candidate-card-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
 .candidate-title { margin: 0; font: 600 14px/1.25 var(--serif); }
@@ -103,6 +105,15 @@ h1 em { color: var(--green); font-weight: 500; }
 .candidate-stage-icon { text-align: center; }
 .candidate-stage-distance { color: #92948a; white-space: nowrap; }
 .candidate-empty { padding: 13px; color: #797d73; font-size: 11px; }
+.fare-breakdown { margin-top: 9px; border-top: 1px solid #eeece5; color: #555b52; }
+.fare-breakdown summary { padding: 8px 0 2px; color: #53674f; cursor: pointer; font-size: 9px; font-weight: 700; list-style-position: inside; }
+.fare-breakdown summary:hover { color: #34543c; }
+.fare-breakdown-rows { display: grid; gap: 5px; margin: 6px 0 2px; }
+.fare-breakdown-rows > div { display: flex; justify-content: space-between; gap: 12px; }
+.fare-breakdown-rows dt { color: #777b72; font-size: 9px; }
+.fare-breakdown-rows dd { margin: 0; color: #454b42; font-size: 9px; font-weight: 700; }
+.fare-breakdown-rows > .fare-total-row dt, .fare-breakdown-rows > .fare-total-row dd { color: #263329; font-weight: 800; }
+.fare-breakdown-rows .fare-discount-detail dt, .fare-breakdown-rows .fare-discount-detail dd { color: #46744c; }
 
 .panel-actions { display: flex; align-items: center; gap: 9px; margin-top: 15px; }
 .swap-button, .quick-button { min-height: 34px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 9px; border: 1px solid transparent; border-radius: 4px; background: transparent; color: #5c6259; cursor: pointer; font-size: 10px; font-weight: 600; white-space: nowrap; transition: background 150ms ease, border-color 150ms ease, color 150ms ease, transform 150ms ease; }

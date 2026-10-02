@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from app.calculations.distance import haversine_distance_meters, interpolate_great_circle, polyline_distance_meters
+from app.calculations.fares import FareEngine, fare_engine
 from app.models.route import LocationPoint, RouteLeg, RouteRequest, RouteResponse
 from app.models.transit import BusLeg, BusRoute, BusStop
 from app.transport.walking import WALKING_SPEED_KMH, WalkingRouter, walking_router
@@ -75,10 +76,12 @@ class BusRouter:
         network_path: Path | str = NETWORK_PATH,
         walking: WalkingRouter | None = None,
         walking_radius_meters: float = WALKING_RADIUS_METERS,
+        fares: FareEngine | None = None,
     ) -> None:
         self.network_path = Path(network_path)
         self.walking = walking or walking_router
         self.walking_radius_meters = walking_radius_meters
+        self.fares = fares or fare_engine
         self.routes = self._load_routes()
 
     def _load_routes(self) -> list[BusRoute]:
@@ -94,18 +97,6 @@ class BusRouter:
     @staticmethod
     def _stop_distance(point: LocationPoint, stop: BusStop) -> float:
         return haversine_distance_meters((point.lat, point.lng), (stop.lat, stop.lng))
-
-    @staticmethod
-    def _fare(distance_km: float) -> float:
-        if distance_km <= 2:
-            return 5.0
-        if distance_km <= 8:
-            return 10.0
-        if distance_km <= 14:
-            return 15.0
-        if distance_km <= 20:
-            return 20.0
-        return 25.0
 
     def _select_bus_leg(self, request: RouteRequest) -> tuple[BusLeg, float, float, BusStop, BusStop] | None:
         best: tuple[tuple[float, float, float], BusLeg, float, float, BusStop, BusStop] | None = None
@@ -132,7 +123,7 @@ class BusRouter:
                         alight_stop=alight_stop,
                         distance_km=round(distance_km, 3),
                         duration_min=round(duration_min, 1),
-                        fare_inr=self._fare(distance_km),
+                        fare_inr=self.fares.bus(distance_km).total_fare,
                         co2_grams=round(distance_km * CO2_GRAMS_PER_PASSENGER_KM, 1),
                         geometry=[[round(stop.lat, 7), round(stop.lng, 7)] for stop in transit_stops],
                     )
@@ -145,12 +136,13 @@ class BusRouter:
                         best = candidate
         return best[1:] if best else None
 
-    def route(self, request: RouteRequest) -> RouteResponse:
+    def route(self, request: RouteRequest, *, daily_pass: bool = False, discount_rate: float = 0.0) -> RouteResponse:
         """Return walk-to-stop, bus, and walk-from-stop legs for a journey."""
         selected = self._select_bus_leg(request)
         if selected is None:
             raise ValueError("No direct bus route found within 1.5 km of both locations")
         bus_leg, _, _, board_stop, alight_stop = selected
+        bus_fare = self.fares.bus(bus_leg.distance_km, daily_pass=daily_pass, discount_rate=discount_rate)
 
         walk_to = self.walking.route(RouteRequest(
             origin=request.origin,
@@ -163,20 +155,26 @@ class BusRouter:
 
         legs = [
             RouteLeg(mode="walking", distance_km=walk_to.distance_km, duration_min=walk_to.duration_min,
-                     fare_inr=0.0, co2_grams=0.0, geometry=walk_to.geometry),
+                     fare_inr=0.0, co2_grams=0.0, geometry=walk_to.geometry,
+                     fare_breakdown=walk_to.fare_breakdown or self.fares.walking()),
             RouteLeg(mode="bus", distance_km=bus_leg.distance_km, duration_min=bus_leg.duration_min,
-                     fare_inr=bus_leg.fare_inr, co2_grams=bus_leg.co2_grams, geometry=bus_leg.geometry,
+                     fare_inr=bus_fare.total_fare, co2_grams=bus_leg.co2_grams, geometry=bus_leg.geometry,
+                     fare_breakdown=bus_fare,
                      route_name=bus_leg.route_name, board_stop=bus_leg.board_stop, alight_stop=bus_leg.alight_stop),
             RouteLeg(mode="walking", distance_km=walk_from.distance_km, duration_min=walk_from.duration_min,
-                     fare_inr=0.0, co2_grams=0.0, geometry=walk_from.geometry),
+                     fare_inr=0.0, co2_grams=0.0, geometry=walk_from.geometry,
+                     fare_breakdown=walk_from.fare_breakdown or self.fares.walking()),
         ]
         return RouteResponse(
             mode="bus",
             total_distance_km=round(sum(leg.distance_km for leg in legs), 3),
             total_duration_min=round(sum(leg.duration_min for leg in legs), 1),
-            total_fare_inr=bus_leg.fare_inr,
+            total_fare_inr=bus_fare.total_fare,
             total_co2_grams=bus_leg.co2_grams,
             legs=legs,
+            fare_breakdown=self.fares.combine(
+                [leg.fare_breakdown or self.fares.zero(leg.mode) for leg in legs], mode="bus"
+            ),
         )
 
 

@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 
 from app.calculations.distance import haversine_distance_meters
+from app.calculations.fares import FareEngine, fare_engine
 from app.models.route import LocationPoint, RouteLeg, RouteRequest, RouteResponse
 from app.routing.candidates import CandidateGenerator, RouteCandidate
 from app.transport.bus import BusRouter, bus_router
@@ -26,11 +27,13 @@ class MultimodalRouter:
         walking: WalkingRouter | None = None,
         bus: BusRouter | None = None,
         metro: MetroRouter | None = None,
+        fares: FareEngine | None = None,
     ) -> None:
         self.generator = generator or CandidateGenerator()
         self.walking = walking or walking_router
         self.bus = bus or bus_router
         self.metro = metro or metro_router
+        self.fares = fares or fare_engine
 
     def route(self, request: RouteRequest) -> list[RouteResponse]:
         candidates = self.generator.generate(request)
@@ -122,7 +125,8 @@ class MultimodalRouter:
                 *bus_legs,
                 walk_transfer,
                 RouteLeg(mode="transfer", distance_km=0.0, duration_min=TRANSFER_PENALTY_MINUTES,
-                         fare_inr=0.0, co2_grams=0.0, geometry=[], transfer_station=board_station),
+                         fare_inr=0.0, co2_grams=0.0, geometry=[], transfer_station=board_station,
+                         fare_breakdown=self.fares.zero("transfer")),
                 *metro_legs,
             ]
             combined = RouteResponse(
@@ -132,6 +136,9 @@ class MultimodalRouter:
                 total_fare_inr=round(sum(leg.fare_inr for leg in legs), 2),
                 total_co2_grams=round(sum(leg.co2_grams for leg in legs), 1),
                 legs=legs,
+                fare_breakdown=self.fares.combine(
+                    [leg.fare_breakdown or self.fares.zero(leg.mode) for leg in legs], mode="multimodal"
+                ),
             )
             candidates.append(RouteCandidate.from_response(
                 combined,

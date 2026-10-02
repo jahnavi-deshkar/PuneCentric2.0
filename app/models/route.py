@@ -21,6 +21,20 @@ class RouteRequest(BaseModel):
     destination: LocationPoint
 
 
+class FareBreakdown(BaseModel):
+    """Normalized itemized fare returned by the centralized fare engine."""
+
+    mode: str
+    base_fare: float = Field(default=0, ge=0)
+    distance_fare: float = Field(default=0, ge=0)
+    surcharges: float = Field(default=0, ge=0)
+    discounts: float = Field(default=0, ge=0)
+    total_fare: float = Field(default=0, ge=0)
+    currency: str = "INR"
+    surcharge_details: dict[str, float] = Field(default_factory=dict)
+    discount_details: dict[str, float] = Field(default_factory=dict)
+
+
 class RouteLeg(BaseModel):
     mode: str
     distance_km: float = Field(ge=0)
@@ -46,6 +60,7 @@ class RouteLeg(BaseModel):
     fare_currency: str | None = None
     from_label: str | None = None
     to_label: str | None = None
+    fare_breakdown: FareBreakdown | None = None
 
 
 class RouteResponse(BaseModel):
@@ -59,3 +74,4 @@ class RouteResponse(BaseModel):
     candidate_name: str | None = None
     transfers_count: int = Field(default=0, ge=0)
     walk_distance_km: float = Field(default=0, ge=0)
+    fare_breakdown: FareBreakdown | None = None

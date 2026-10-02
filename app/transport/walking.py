@@ -10,6 +10,7 @@ from typing import Any
 import networkx as nx
 from shapely.geometry import LineString
 
+from app.calculations.fares import fare_engine
 from app.calculations.distance import (
     destination_point,
     haversine_distance_meters,
@@ -209,6 +210,7 @@ class WalkingRouter:
             fare_inr=0.0,
             co2_grams=0.0,
             geometry=geometry,
+            fare_breakdown=fare_engine.walking(),
         )
         return RouteResponse(
             mode="walking",
@@ -217,6 +219,7 @@ class WalkingRouter:
             total_fare_inr=0.0,
             total_co2_grams=0.0,
             legs=[leg],
+            fare_breakdown=fare_engine.combine([leg.fare_breakdown], mode="walking"),
         )
 
 

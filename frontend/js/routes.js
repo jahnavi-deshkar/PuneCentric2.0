@@ -83,6 +83,48 @@
     container.append(item);
   }
 
+  function fareAccordion(route) {
+    const breakdown = route.fare_breakdown;
+    if (!breakdown) return null;
+    const details = document.createElement("details");
+    details.className = "fare-breakdown";
+    const summary = document.createElement("summary");
+    summary.textContent = `Fare breakdown · ₹${Number(breakdown.total_fare || route.total_fare_inr || 0).toFixed(2)}`;
+    const rows = document.createElement("dl");
+    rows.className = "fare-breakdown-rows";
+    const hasNightSurcharge = Object.hasOwn(breakdown.surcharge_details || {}, "night_surcharge");
+    [
+      ["Base fare", breakdown.base_fare],
+      ["Distance charge", breakdown.distance_fare],
+      [hasNightSurcharge ? "Night surcharge" : "Surcharges", breakdown.surcharges],
+      ["Discounts", -Number(breakdown.discounts || 0)],
+      ["Total fare", breakdown.total_fare],
+    ].forEach(([label, amount]) => {
+      const row = document.createElement("div");
+      if (label === "Total fare") row.className = "fare-total-row";
+      const term = document.createElement("dt");
+      term.textContent = label;
+      const value = document.createElement("dd");
+      const number = Number(amount || 0);
+      value.textContent = `${number < 0 ? "−" : ""}₹${Math.abs(number).toFixed(2)}`;
+      row.append(term, value);
+      rows.append(row);
+    });
+    Object.entries(breakdown.discount_details || {}).forEach(([name, amount]) => {
+      if (!amount) return;
+      const row = document.createElement("div");
+      row.className = "fare-discount-detail";
+      const term = document.createElement("dt");
+      term.textContent = `${name} discount`;
+      const value = document.createElement("dd");
+      value.textContent = `−₹${Number(amount).toFixed(2)}`;
+      row.append(term, value);
+      rows.append(row);
+    });
+    details.append(summary, rows);
+    return details;
+  }
+
   function renderSummary(route, mode, container) {
     container.replaceChildren();
     const heading = document.createElement("div");
@@ -111,27 +153,6 @@
           ["Board", busLeg.board_stop?.name || "—"],
           ["Alight", busLeg.alight_stop?.name || "—"],
         ].forEach(([label, value]) => {
-          const row = document.createElement("div");
-          const term = document.createElement("dt");
-          term.textContent = label;
-          const description = document.createElement("dd");
-          description.textContent = value;
-          row.append(term, description);
-          details.append(row);
-        });
-        container.append(details);
-      }
-    } else if (mode === "auto") {
-      const autoLeg = (route.legs || []).find((leg) => leg.mode === "auto");
-      if (autoLeg) {
-        const details = document.createElement("dl");
-        details.className = "auto-fare-details";
-        const rows = [
-          ["Base · first 1.5 km", `₹${Number(autoLeg.fare_base_inr || 0).toFixed(2)}`],
-          [`Distance · ₹${Number(autoLeg.fare_rate_per_km || 0).toFixed(0)}/km`, `₹${Number(autoLeg.fare_distance_inr || 0).toFixed(2)}`],
-          ["Night surcharge · 25%", autoLeg.night_surcharge_applied ? `₹${Number(autoLeg.fare_night_surcharge_inr || 0).toFixed(2)}` : "Not applied"],
-        ];
-        rows.forEach(([label, value]) => {
           const row = document.createElement("div");
           const term = document.createElement("dt");
           term.textContent = label;
@@ -186,6 +207,8 @@
     addMetric(grid, "Duration", `${Math.round(Number(route.total_duration_min || 0))} min`);
     addMetric(grid, "Fare", `₹${Number(route.total_fare_inr || 0).toFixed(0)}`);
     addMetric(grid, "CO₂", `${Math.round(Number(route.total_co2_grams || 0))} g`);
+    const breakdown = fareAccordion(route);
+    if (breakdown) container.append(breakdown);
     container.append(grid);
     container.hidden = false;
   }
@@ -228,9 +251,6 @@
     routes.forEach((route, index) => {
       const card = document.createElement("article");
       card.className = `candidate-card${index === 0 ? " is-selected" : ""}`;
-      card.setAttribute("aria-pressed", String(index === 0));
-      card.setAttribute("role", "button");
-      card.tabIndex = 0;
       const heading = document.createElement("div");
       heading.className = "candidate-card-heading";
       const name = document.createElement("h3");
@@ -239,7 +259,13 @@
       const badge = document.createElement("span");
       badge.className = "candidate-badge";
       badge.textContent = index === 0 ? "Fastest" : `${route.transfers_count || 0} transfers`;
-      heading.append(name, badge);
+      const selectButton = document.createElement("button");
+      selectButton.type = "button";
+      selectButton.className = "candidate-select";
+      selectButton.textContent = "Show on map";
+      selectButton.setAttribute("aria-pressed", String(index === 0));
+      selectButton.setAttribute("aria-label", `Show ${name.textContent} on map`);
+      heading.append(name, badge, selectButton);
       const metrics = document.createElement("div");
       metrics.className = "candidate-metrics";
       [
@@ -278,7 +304,9 @@
         item.append(icon, description, distance);
         timeline.append(item);
       });
+      const fareDetails = fareAccordion(route);
       card.append(heading, metrics, timeline);
+      if (fareDetails) card.append(fareDetails);
       const selectCard = () => {
         list.querySelectorAll(".candidate-card").forEach((other) => {
           const active = other === card;
@@ -287,13 +315,7 @@
         });
         onSelect(route);
       };
-      card.addEventListener("click", selectCard);
-      card.addEventListener("keydown", (event) => {
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          selectCard();
-        }
-      });
+      selectButton.addEventListener("click", selectCard);
       list.append(card);
     });
     container.append(list);

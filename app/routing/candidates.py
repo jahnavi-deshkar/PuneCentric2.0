@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 
+from app.calculations.fares import fare_engine
 from app.models.route import RouteLeg, RouteRequest, RouteResponse
 from app.transport.auto import AutoRouter, auto_router
 from app.transport.bus import BusRouter, bus_router
@@ -40,12 +41,16 @@ class RouteCandidate:
         changes = sum(first != second for first, second in zip(vehicle_modes, vehicle_modes[1:]))
         explicit_transfers = sum(leg.mode == "transfer" for leg in legs)
         changes = max(changes, explicit_transfers)
+        fare_summary = fare_engine.combine(
+            [leg.fare_breakdown or fare_engine.zero(leg.mode) for leg in legs], mode="multimodal"
+        )
         normalized = response.model_copy(update={
             "mode": "multimodal",
             "candidate_id": candidate_id,
             "candidate_name": candidate_name,
             "transfers_count": changes,
             "walk_distance_km": round(walk_distance, 3),
+            "fare_breakdown": fare_summary,
         })
         return cls(
             candidate_id=candidate_id,
@@ -188,4 +193,7 @@ class CandidateGenerator:
             total_fare_inr=round(sum(leg.fare_inr for leg in legs), 2),
             total_co2_grams=round(sum(leg.co2_grams for leg in legs), 1),
             legs=legs,
+            fare_breakdown=fare_engine.combine(
+                [leg.fare_breakdown or fare_engine.zero(leg.mode) for leg in legs], mode=mode
+            ),
         )
