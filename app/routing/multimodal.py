@@ -6,6 +6,7 @@ import logging
 
 from app.calculations.distance import haversine_distance_meters
 from app.calculations.fares import FareEngine, fare_engine
+from app.calculations.emissions import EmissionEngine, emission_engine
 from app.models.route import LocationPoint, RouteLeg, RouteRequest, RouteResponse
 from app.routing.candidates import CandidateGenerator, RouteCandidate
 from app.transport.bus import BusRouter, bus_router
@@ -28,8 +29,10 @@ class MultimodalRouter:
         bus: BusRouter | None = None,
         metro: MetroRouter | None = None,
         fares: FareEngine | None = None,
+        emissions: EmissionEngine | None = None,
     ) -> None:
-        self.generator = generator or CandidateGenerator()
+        self.emissions = emissions or emission_engine
+        self.generator = generator or CandidateGenerator(emissions=self.emissions)
         self.walking = walking or walking_router
         self.bus = bus or bus_router
         self.metro = metro or metro_router
@@ -125,25 +128,29 @@ class MultimodalRouter:
                 *bus_legs,
                 walk_transfer,
                 RouteLeg(mode="transfer", distance_km=0.0, duration_min=TRANSFER_PENALTY_MINUTES,
-                         fare_inr=0.0, co2_grams=0.0, geometry=[], transfer_station=board_station,
-                         fare_breakdown=self.fares.zero("transfer")),
+                         fare_inr=0.0, geometry=[], transfer_station=board_station,
+                         fare_breakdown=self.fares.zero("transfer"),
+                         **self.emissions.leg_metrics("walking", 0.0)),
                 *metro_legs,
             ]
+            total_distance_km = round(sum(leg.distance_km for leg in legs), 3)
+            route_environment = self.emissions.route_metrics(legs, total_distance_km)
             combined = RouteResponse(
                 mode="multimodal",
-                total_distance_km=round(sum(leg.distance_km for leg in legs), 3),
+                total_distance_km=total_distance_km,
                 total_duration_min=round(sum(leg.duration_min for leg in legs), 1),
                 total_fare_inr=round(sum(leg.fare_inr for leg in legs), 2),
-                total_co2_grams=round(sum(leg.co2_grams for leg in legs), 1),
                 legs=legs,
                 fare_breakdown=self.fares.combine(
                     [leg.fare_breakdown or self.fares.zero(leg.mode) for leg in legs], mode="multimodal"
                 ),
+                **route_environment,
             )
             candidates.append(RouteCandidate.from_response(
                 combined,
                 f"bus-metro-{index + 1}",
                 f"Bus + Metro via {station.name}",
+                self.emissions,
             ))
         return candidates
 

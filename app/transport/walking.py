@@ -11,6 +11,7 @@ import networkx as nx
 from shapely.geometry import LineString
 
 from app.calculations.fares import fare_engine
+from app.calculations.emissions import emission_engine
 from app.calculations.distance import (
     destination_point,
     haversine_distance_meters,
@@ -203,23 +204,36 @@ class WalkingRouter:
         distance_km = distance_meters / 1000.0
         duration_min = distance_km / WALKING_SPEED_KMH * 60.0
         geometry = [[round(lat, 7), round(lng, 7)] for lat, lng in coordinates]
+        environmental = emission_engine.leg_metrics("walking", distance_km)
         leg = RouteLeg(
             mode="walking",
             distance_km=round(distance_km, 3),
             duration_min=round(duration_min, 1),
             fare_inr=0.0,
-            co2_grams=0.0,
+            co2_grams=float(environmental["co2_grams"]),
             geometry=geometry,
             fare_breakdown=fare_engine.walking(),
+            co2_saved_grams=float(environmental["co2_saved_grams"]),
+            eco_badge=str(environmental["eco_badge"]),
+            trees_equivalent=float(environmental["trees_equivalent"]),
+            smartphone_charges_equivalent=float(environmental["smartphone_charges_equivalent"]),
+            private_car_baseline_co2_grams=float(environmental["private_car_baseline_co2_grams"]),
         )
+        route_environment = emission_engine.route_metrics([leg], leg.distance_km)
         return RouteResponse(
             mode="walking",
             total_distance_km=leg.distance_km,
             total_duration_min=leg.duration_min,
             total_fare_inr=0.0,
-            total_co2_grams=0.0,
+            total_co2_grams=float(route_environment["total_co2_grams"]),
+            co2_grams=float(route_environment["co2_grams"]),
             legs=[leg],
             fare_breakdown=fare_engine.combine([leg.fare_breakdown], mode="walking"),
+            co2_saved_grams=float(route_environment["co2_saved_grams"]),
+            eco_badge=str(route_environment["eco_badge"]),
+            trees_equivalent=float(route_environment["trees_equivalent"]),
+            smartphone_charges_equivalent=float(route_environment["smartphone_charges_equivalent"]),
+            private_car_baseline_co2_grams=float(route_environment["private_car_baseline_co2_grams"]),
         )
 
 

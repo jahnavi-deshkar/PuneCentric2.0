@@ -6,6 +6,7 @@ import logging
 from dataclasses import dataclass
 
 from app.calculations.fares import fare_engine
+from app.calculations.emissions import EmissionEngine, emission_engine
 from app.models.route import RouteLeg, RouteRequest, RouteResponse
 from app.transport.auto import AutoRouter, auto_router
 from app.transport.bus import BusRouter, bus_router
@@ -33,9 +34,16 @@ class RouteCandidate:
 
     @classmethod
     def from_response(
-        cls, response: RouteResponse, candidate_id: str, candidate_name: str
+        cls, response: RouteResponse, candidate_id: str, candidate_name: str,
+        emissions: EmissionEngine | None = None,
     ) -> "RouteCandidate":
-        legs = response.legs
+        engine = emissions or emission_engine
+        legs = [
+            leg.model_copy(update=engine.leg_metrics(leg.mode, leg.distance_km))
+            if leg.mode in {"walking", "bus", "metro", "auto"}
+            else leg.model_copy(update=engine.leg_metrics("walking", 0.0))
+            for leg in response.legs
+        ]
         walk_distance = sum(leg.distance_km for leg in legs if leg.mode == "walking")
         vehicle_modes = [leg.mode for leg in legs if leg.mode in TRANSIT_MODES]
         changes = sum(first != second for first, second in zip(vehicle_modes, vehicle_modes[1:]))
@@ -44,13 +52,16 @@ class RouteCandidate:
         fare_summary = fare_engine.combine(
             [leg.fare_breakdown or fare_engine.zero(leg.mode) for leg in legs], mode="multimodal"
         )
+        environment = engine.route_metrics(legs, response.total_distance_km)
         normalized = response.model_copy(update={
+            "legs": legs,
             "mode": "multimodal",
             "candidate_id": candidate_id,
             "candidate_name": candidate_name,
             "transfers_count": changes,
             "walk_distance_km": round(walk_distance, 3),
             "fare_breakdown": fare_summary,
+            **environment,
         })
         return cls(
             candidate_id=candidate_id,
@@ -77,17 +88,19 @@ class CandidateGenerator:
         bus: BusRouter | None = None,
         metro: MetroRouter | None = None,
         auto: AutoRouter | None = None,
+        emissions: EmissionEngine | None = None,
     ) -> None:
         self.walking = walking or walking_router
         self.bus = bus or bus_router
         self.metro = metro or metro_router
         self.auto = auto or auto_router
+        self.emissions = emissions or emission_engine
 
     def generate(self, request: RouteRequest) -> list[RouteCandidate]:
         candidates: list[RouteCandidate] = []
         try:
             candidates.append(RouteCandidate.from_response(
-                self.walking.route(request), "walking-direct", "Direct walk"
+                self.walking.route(request), "walking-direct", "Direct walk", self.emissions
             ))
         except (ValueError, RuntimeError) as exc:
             LOGGER.info("Walking candidate unavailable: %s", exc)
@@ -99,7 +112,7 @@ class CandidateGenerator:
         ):
             try:
                 response = router.route(request)
-                candidates.append(RouteCandidate.from_response(response, f"{mode}-direct", title))
+                candidates.append(RouteCandidate.from_response(response, f"{mode}-direct", title, self.emissions))
                 if mode in {"bus", "metro"}:
                     candidates.extend(self._connector_variants(response, mode, request))
             except (ValueError, RuntimeError) as exc:
@@ -154,7 +167,8 @@ class CandidateGenerator:
             transfer_leg = RouteLeg(
                 mode="transfer", distance_km=0.0,
                 duration_min=MODE_CHANGE_PENALTY_MINUTES,
-                fare_inr=0.0, co2_grams=0.0, geometry=[],
+                fare_inr=0.0, geometry=[],
+                **self.emissions.leg_metrics("walking", 0.0),
             )
             if use_last:
                 legs.insert(last, transfer_leg)
@@ -166,6 +180,7 @@ class CandidateGenerator:
                 f"Auto + {transit_title}" if use_first and not use_last else
                 f"{transit_title} + auto" if use_last and not use_first else
                 f"Auto + {transit_title} + auto",
+                self.emissions,
             ))
         return variants
 
@@ -184,16 +199,17 @@ class CandidateGenerator:
             return LocationPoint(lat=station.lat, lng=station.lng, label=station.name)
         raise ValueError("Transit stop/station missing")
 
-    @staticmethod
-    def _sum_legs(mode: str, legs: list[RouteLeg]) -> RouteResponse:
+    def _sum_legs(self, mode: str, legs: list[RouteLeg]) -> RouteResponse:
+        distance = round(sum(leg.distance_km for leg in legs), 3)
+        environment = self.emissions.route_metrics(legs, distance)
         return RouteResponse(
             mode=mode,
-            total_distance_km=round(sum(leg.distance_km for leg in legs), 3),
+            total_distance_km=distance,
             total_duration_min=round(sum(leg.duration_min for leg in legs), 1),
             total_fare_inr=round(sum(leg.fare_inr for leg in legs), 2),
-            total_co2_grams=round(sum(leg.co2_grams for leg in legs), 1),
             legs=legs,
             fare_breakdown=fare_engine.combine(
                 [leg.fare_breakdown or fare_engine.zero(leg.mode) for leg in legs], mode=mode
             ),
+            **environment,
         )

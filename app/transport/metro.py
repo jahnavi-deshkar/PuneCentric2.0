@@ -11,6 +11,7 @@ import networkx as nx
 
 from app.calculations.distance import haversine_distance_meters, polyline_distance_meters
 from app.calculations.fares import FareEngine, fare_engine
+from app.calculations.emissions import EmissionEngine, emission_engine
 from app.models.route import LocationPoint, RouteLeg, RouteRequest, RouteResponse
 from app.models.transit import MetroLeg, MetroLine, MetroStation
 from app.transport.walking import WALKING_SPEED_KMH, WalkingRouter, walking_router
@@ -22,7 +23,6 @@ ACCESS_RADIUS_METERS = 2500.0
 METRO_SPEED_KMH = 38.0
 STATION_DWELL_MINUTES = 0.5
 INTERCHANGE_PENALTY_MINUTES = 3.0
-CO2_GRAMS_PER_PASSENGER_KM = 15.0
 
 
 class MetroRouter:
@@ -34,11 +34,13 @@ class MetroRouter:
         walking: WalkingRouter | None = None,
         access_radius_meters: float = ACCESS_RADIUS_METERS,
         fares: FareEngine | None = None,
+        emissions: EmissionEngine | None = None,
     ) -> None:
         self.network_path = Path(network_path)
         self.walking = walking or walking_router
         self.access_radius_meters = access_radius_meters
         self.fares = fares or fare_engine
+        self.emissions = emissions or emission_engine
         self.stations: dict[str, MetroStation] = {}
         self.lines: dict[str, MetroLine] = {}
         self.graph = nx.Graph()
@@ -190,7 +192,8 @@ class MetroRouter:
 
         legs: list[RouteLeg] = [RouteLeg(
             mode="walking", distance_km=walk_to.distance_km, duration_min=walk_to.duration_min,
-            fare_inr=0.0, co2_grams=0.0, geometry=walk_to.geometry,
+            fare_inr=0.0, geometry=walk_to.geometry,
+            **self.emissions.leg_metrics("walking", walk_to.distance_km),
             fare_breakdown=walk_to.fare_breakdown or self.fares.walking(),
         )]
         rail_legs: list[RouteLeg] = []
@@ -201,9 +204,10 @@ class MetroRouter:
             stations: list[MetroStation] = part["stations"]
             distance_km = self._part_distance_km(part)
             duration_min = distance_km / METRO_SPEED_KMH * 60 + max(0, len(stations) - 2) * STATION_DWELL_MINUTES
+            leg_emissions = self.emissions.leg_metrics("metro", distance_km)
             rail_legs.append(RouteLeg(
                 mode="metro", distance_km=round(distance_km, 3), duration_min=round(duration_min, 1),
-                fare_inr=0.0, co2_grams=round(distance_km * CO2_GRAMS_PER_PASSENGER_KM, 1),
+                fare_inr=0.0, **leg_emissions,
                 geometry=[[round(station.lat, 7), round(station.lng, 7)] for station in stations],
                 line_id=line.line_id, line_name=line.line_name, line_color=line.line_color,
                 board_station=stations[0], alight_station=stations[-1],
@@ -225,24 +229,28 @@ class MetroRouter:
                 station = part["station"]
                 legs.append(RouteLeg(
                     mode="transfer", distance_km=0.0, duration_min=INTERCHANGE_PENALTY_MINUTES,
-                    fare_inr=0.0, co2_grams=0.0, geometry=[], transfer_station=station,
+                    fare_inr=0.0, geometry=[], transfer_station=station,
+                    **self.emissions.leg_metrics("walking", 0.0),
                     fare_breakdown=self.fares.zero("transfer"),
                 ))
         legs.append(RouteLeg(
             mode="walking", distance_km=walk_from.distance_km, duration_min=walk_from.duration_min,
-            fare_inr=0.0, co2_grams=0.0, geometry=walk_from.geometry,
+            fare_inr=0.0, geometry=walk_from.geometry,
+            **self.emissions.leg_metrics("walking", walk_from.distance_km),
             fare_breakdown=walk_from.fare_breakdown or self.fares.walking(),
         ))
+        total_distance_km = round(sum(leg.distance_km for leg in legs), 3)
+        route_environment = self.emissions.route_metrics(legs, total_distance_km)
         return RouteResponse(
             mode="metro",
-            total_distance_km=round(sum(leg.distance_km for leg in legs), 3),
+            total_distance_km=total_distance_km,
             total_duration_min=round(sum(leg.duration_min for leg in legs), 1),
             total_fare_inr=fare,
-            total_co2_grams=round(sum(leg.co2_grams for leg in legs), 1),
             legs=legs,
             fare_breakdown=self.fares.combine(
                 [leg.fare_breakdown or self.fares.zero(leg.mode) for leg in legs], mode="metro"
             ),
+            **route_environment,
         )
 
 

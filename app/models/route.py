@@ -41,6 +41,11 @@ class RouteLeg(BaseModel):
     duration_min: float = Field(ge=0)
     fare_inr: float = Field(ge=0)
     co2_grams: float = Field(ge=0)
+    co2_saved_grams: float = 0.0
+    eco_badge: str | None = None
+    trees_equivalent: float = Field(default=0, ge=0)
+    smartphone_charges_equivalent: float = Field(default=0, ge=0)
+    private_car_baseline_co2_grams: float = Field(default=0, ge=0)
     geometry: list[list[float]]
     route_name: str | None = None
     board_stop: BusStop | None = None
@@ -69,9 +74,15 @@ class RouteResponse(BaseModel):
     total_duration_min: float = Field(ge=0)
     total_fare_inr: float = Field(ge=0)
     total_co2_grams: float = Field(ge=0)
+    co2_grams: float = Field(default=0, ge=0)
     legs: list[RouteLeg]
     candidate_id: str | None = None
     candidate_name: str | None = None
     transfers_count: int = Field(default=0, ge=0)
     walk_distance_km: float = Field(default=0, ge=0)
     fare_breakdown: FareBreakdown | None = None
+    co2_saved_grams: float = 0.0
+    eco_badge: str | None = None
+    trees_equivalent: float = Field(default=0, ge=0)
+    smartphone_charges_equivalent: float = Field(default=0, ge=0)
+    private_car_baseline_co2_grams: float = Field(default=0, ge=0)

@@ -15,6 +15,7 @@ import networkx as nx
 
 from app.calculations.distance import haversine_distance_meters, polyline_distance_meters
 from app.calculations.fares import FareEngine, fare_engine
+from app.calculations.emissions import EmissionEngine, emission_engine
 from app.models.route import LocationPoint, RouteLeg, RouteRequest, RouteResponse
 from app.transport.walking import WalkingRouter, walking_router
 
@@ -27,7 +28,6 @@ DRIVING_GRAPH_PATHS = (
 )
 
 AVERAGE_SPEED_KMH = 25.0
-CO2_GRAMS_PER_KM = 70.0
 CONNECTOR_WALK_THRESHOLD_METERS = 800.0
 
 
@@ -35,10 +35,11 @@ class AutoRouter:
     """Route autos over an available OSMnx driving graph, with offline fallback."""
 
     def __init__(self, graph: nx.Graph | None = None, graph_path: Path | str | None = None,
-                 fares: FareEngine | None = None) -> None:
+                 fares: FareEngine | None = None, emissions: EmissionEngine | None = None) -> None:
         self.graph = graph if graph is not None else self._load_driving_graph(graph_path)
         self._graph_router = WalkingRouter(graph=self.graph) if self.graph is not None else None
         self.fares = fares or fare_engine
+        self.emissions = emissions or emission_engine
 
     @staticmethod
     def _load_driving_graph(graph_path: Path | str | None) -> nx.Graph | None:
@@ -80,6 +81,7 @@ class AutoRouter:
         points, distance_meters = self._route_points(start, end)
         distance_km = distance_meters / 1000.0
         breakdown = self.fares.auto(distance_km, night_surcharge=night_surcharge)
+        environmental = self.emissions.leg_metrics("auto", distance_km)
         auto_tariff = self.fares.tariffs["auto"]
 
         leg = RouteLeg(
@@ -87,8 +89,8 @@ class AutoRouter:
             distance_km=round(distance_km, 3),
             duration_min=round(distance_km / AVERAGE_SPEED_KMH * 60.0, 1),
             fare_inr=breakdown.total_fare,
-            co2_grams=round(distance_km * CO2_GRAMS_PER_KM, 1),
             geometry=[[round(lat, 7), round(lng, 7)] for lat, lng in points],
+            **environmental,
             fare_base_inr=breakdown.base_fare,
             fare_distance_inr=breakdown.distance_fare,
             fare_night_surcharge_inr=breakdown.surcharges,
@@ -99,14 +101,15 @@ class AutoRouter:
             from_label=request.origin.label,
             to_label=request.destination.label,
         )
+        route_environment = self.emissions.route_metrics([leg], leg.distance_km)
         return RouteResponse(
             mode="auto",
             total_distance_km=leg.distance_km,
             total_duration_min=leg.duration_min,
             total_fare_inr=leg.fare_inr,
-            total_co2_grams=leg.co2_grams,
             legs=[leg],
             fare_breakdown=breakdown,
+            **route_environment,
         )
 
     @staticmethod

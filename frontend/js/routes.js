@@ -125,6 +125,61 @@
     return details;
   }
 
+  function environmentalSection(route) {
+    const distance = Number(route.total_distance_km || 0);
+    const routeCo2 = Number(route.total_co2_grams || 0);
+    const carCo2 = Number(route.private_car_baseline_co2_grams || distance * 120);
+    const saved = Number(route.co2_saved_grams ?? (carCo2 - routeCo2));
+    const trees = Number(route.trees_equivalent ?? Math.max(0, saved) / 59);
+    const charges = Number(route.smartphone_charges_equivalent ?? Math.max(0, saved) / 8.22);
+    const details = document.createElement("details");
+    details.className = "environmental-footprint";
+    const summary = document.createElement("summary");
+    const headline = saved >= 0 ? `Saved ${Math.round(saved)}g CO₂ vs car` : `Emits ${Math.round(Math.abs(saved))}g more than car`;
+    summary.textContent = `Environmental footprint · ${headline}`;
+
+    const comparison = document.createElement("div");
+    comparison.className = "eco-comparison";
+    const scale = Math.max(carCo2, routeCo2, 1);
+    [["This route", routeCo2, "route"], ["Private car", carCo2, "car"]].forEach(([label, value, kind]) => {
+      const row = document.createElement("div");
+      row.className = "eco-bar-row";
+      const heading = document.createElement("div");
+      heading.className = "eco-bar-heading";
+      const name = document.createElement("span");
+      name.textContent = label;
+      const amount = document.createElement("strong");
+      amount.textContent = `${Math.round(value)} g CO₂`;
+      heading.append(name, amount);
+      const track = document.createElement("div");
+      track.className = "eco-bar-track";
+      track.setAttribute("role", "img");
+      track.setAttribute("aria-label", `${label}: ${Math.round(value)} grams carbon dioxide`);
+      const bar = document.createElement("span");
+      bar.className = `eco-bar eco-bar-${kind}`;
+      bar.style.width = `${Math.max(value > 0 ? 3 : 0, Math.min(100, value / scale * 100))}%`;
+      track.append(bar);
+      row.append(heading, track);
+      comparison.append(row);
+    });
+    const equivalent = document.createElement("p");
+    equivalent.className = "eco-equivalency";
+    equivalent.textContent = `That saving is about ${trees.toFixed(1)} tree-days of CO₂ absorption or ${charges.toFixed(1)} smartphone charges.`;
+    details.append(summary, comparison, equivalent);
+    return details;
+  }
+
+  function ecoPill(route) {
+    const pill = document.createElement("span");
+    pill.className = "eco-badge";
+    const saved = Number(route.co2_saved_grams || 0);
+    const badge = route.eco_badge || "🌿 Lower Carbon";
+    pill.textContent = saved >= 0
+      ? `${badge} · Saved ${Math.round(saved)}g CO₂ vs car`
+      : `${badge} · Emits ${Math.round(Math.abs(saved))}g more than car`;
+    return pill;
+  }
+
   function renderSummary(route, mode, container) {
     container.replaceChildren();
     const heading = document.createElement("div");
@@ -142,6 +197,7 @@
     intro.append(kicker, title, caption);
     heading.append(intro);
     container.append(heading);
+    container.append(ecoPill(route));
 
     if (mode === "bus") {
       const busLeg = (route.legs || []).find((leg) => leg.mode === "bus");
@@ -209,6 +265,7 @@
     addMetric(grid, "CO₂", `${Math.round(Number(route.total_co2_grams || 0))} g`);
     const breakdown = fareAccordion(route);
     if (breakdown) container.append(breakdown);
+    container.append(environmentalSection(route));
     container.append(grid);
     container.hidden = false;
   }
@@ -305,13 +362,14 @@
         timeline.append(item);
       });
       const fareDetails = fareAccordion(route);
-      card.append(heading, metrics, timeline);
+      card.append(heading, ecoPill(route), metrics, timeline);
       if (fareDetails) card.append(fareDetails);
+      card.append(environmentalSection(route));
       const selectCard = () => {
         list.querySelectorAll(".candidate-card").forEach((other) => {
           const active = other === card;
           other.classList.toggle("is-selected", active);
-          other.setAttribute("aria-pressed", String(active));
+          other.querySelector(".candidate-select")?.setAttribute("aria-pressed", String(active));
         });
         onSelect(route);
       };

@@ -89,7 +89,7 @@ h1 em { color: var(--green); font-weight: 500; }
 .mode-tab[data-mode="auto"].is-active { color: #8a4c00; }
 .mode-tab[data-mode="multimodal"].is-active { color: #34543c; }
 .candidate-list { display: grid; gap: 8px; max-height: min(63vh, 620px); margin-top: 12px; overflow-y: auto; padding: 1px 3px 3px 1px; }
-.candidate-card { width: 100%; padding: 11px 12px 10px; border: 1px solid #e2dfd5; border-radius: 5px; background: #fffefa; color: var(--ink); text-align: left; cursor: pointer; transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease; }
+.candidate-card { width: 100%; padding: 11px 12px 10px; border: 1px solid #e2dfd5; border-radius: 5px; background: #fffefa; color: var(--ink); text-align: left; transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease; }
 .candidate-card:hover { transform: translateY(-1px); border-color: #bdc9b9; box-shadow: 0 5px 16px #25291e12; }
 .candidate-select { flex: 0 0 auto; padding: 4px 7px; border: 1px solid #e2e2d8; border-radius: 4px; background: transparent; color: #5b6859; cursor: pointer; font-size: 8px; font-weight: 700; }
 .candidate-select:hover, .candidate-select[aria-pressed="true"] { border-color: #a8baa4; background: #eaf0e8; color: #34543c; }
@@ -114,6 +114,19 @@ h1 em { color: var(--green); font-weight: 500; }
 .fare-breakdown-rows dd { margin: 0; color: #454b42; font-size: 9px; font-weight: 700; }
 .fare-breakdown-rows > .fare-total-row dt, .fare-breakdown-rows > .fare-total-row dd { color: #263329; font-weight: 800; }
 .fare-breakdown-rows .fare-discount-detail dt, .fare-breakdown-rows .fare-discount-detail dd { color: #46744c; }
+.eco-badge { max-width: 100%; width: fit-content; display: inline-flex; flex-wrap: wrap; align-items: center; gap: 5px; margin-top: 8px; padding: 5px 8px; border: 1px solid #d5e4d2; border-radius: 999px; background: #edf6eb; color: #376343; font-size: 9px; font-weight: 700; line-height: 1.35; }
+.environmental-footprint { margin-top: 9px; border-top: 1px solid #eeece5; }
+.environmental-footprint summary { padding: 8px 0 3px; color: #42674a; cursor: pointer; font-size: 9px; font-weight: 700; list-style-position: inside; }
+.environmental-footprint summary:hover { color: #294b32; }
+.eco-comparison { display: grid; gap: 8px; margin: 8px 0; }
+.eco-bar-row { display: grid; gap: 4px; }
+.eco-bar-heading { display: flex; justify-content: space-between; gap: 10px; color: #75796f; font-size: 9px; }
+.eco-bar-heading strong { color: #41483f; font-weight: 700; }
+.eco-bar-track { height: 7px; overflow: hidden; border-radius: 999px; background: #ebe9e1; }
+.eco-bar { height: 100%; display: block; border-radius: inherit; transition: width 250ms ease; }
+.eco-bar-route { background: linear-gradient(90deg, #69a978, #3f7850); }
+.eco-bar-car { background: #9b9d94; }
+.eco-equivalency { margin: 7px 0 2px; color: #5e685d; font-size: 9px; line-height: 1.45; }
 
 .panel-actions { display: flex; align-items: center; gap: 9px; margin-top: 15px; }
 .swap-button, .quick-button { min-height: 34px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 9px; border: 1px solid transparent; border-radius: 4px; background: transparent; color: #5c6259; cursor: pointer; font-size: 10px; font-weight: 600; white-space: nowrap; transition: background 150ms ease, border-color 150ms ease, color 150ms ease, transform 150ms ease; }
