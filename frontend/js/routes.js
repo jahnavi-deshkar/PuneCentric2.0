@@ -295,7 +295,21 @@
     const kicker = document.createElement("p");
     kicker.className = "route-summary-kicker";
     kicker.textContent = `${routes.length} journeys · compare time, fare & emissions`;
-    container.append(kicker, title);
+    container.append(kicker);
+    const resultsHeading = document.createElement("div");
+    resultsHeading.className = "route-results-heading";
+    resultsHeading.append(title);
+    if (routes.length) {
+      const analyticsButton = document.createElement("button");
+      analyticsButton.type = "button";
+      analyticsButton.className = "visual-analytics-toggle";
+      analyticsButton.textContent = "Visual analytics";
+      analyticsButton.setAttribute("aria-expanded", "false");
+      analyticsButton.setAttribute("aria-controls", "comparison-drawer");
+      analyticsButton.addEventListener("click", () => window.RouteCharts.open());
+      resultsHeading.append(analyticsButton);
+    }
+    container.append(resultsHeading);
     if (!routes.length) {
       const empty = document.createElement("p");
       empty.className = "candidate-empty";
@@ -315,8 +329,10 @@
       name.className = "candidate-title";
       name.textContent = route.candidate_name || route.candidate_id || "Journey option";
       const badge = document.createElement("span");
-      badge.className = "candidate-badge";
-      badge.textContent = route.preference_tags?.[0] || `${route.transfers_count || 0} transfers`;
+      const modes = [...new Set((route.legs || []).map((leg) => leg.mode).filter((mode) => ["walking", "bus", "metro", "auto"].includes(mode)))];
+      const routeMode = modes.length > 1 ? "multimodal" : (modes[0] || "multimodal");
+      badge.className = `candidate-badge mode-badge mode-${routeMode}`;
+      badge.textContent = routeMode === "multimodal" ? "Mixed journey" : routeMode === "walking" ? "Walking" : routeMode === "bus" ? "PMPML bus" : routeMode === "metro" ? "Pune Metro" : "Auto-rickshaw";
       const selectButton = document.createElement("button");
       selectButton.type = "button";
       selectButton.className = "candidate-select";

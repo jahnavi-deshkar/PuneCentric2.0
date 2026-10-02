@@ -12,10 +12,12 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <link rel="stylesheet" href="/css/style.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="/js/map.js" defer></script>
     <script src="/js/search.js" defer></script>
     <script src="/js/routes.js" defer></script>
     <script src="/js/filters.js" defer></script>
+    <script src="/js/charts.js" defer></script>
     <script src="/js/app.js" defer></script>
   </head>
   <body class="map-page">
@@ -104,6 +106,22 @@
         </div>
 
         <p class="panel-hint" id="map-hint" aria-live="polite">Search for a place or choose “Pick on map”.</p>
+      </section>
+
+      <section id="comparison-drawer" class="comparison-drawer" aria-labelledby="comparison-title" aria-hidden="true" hidden>
+        <div class="comparison-heading">
+          <div><p class="eyebrow"><span class="eyebrow-line"></span> THE JOURNEY, IN PERSPECTIVE</p><h2 id="comparison-title">Compare your routes</h2><p class="comparison-subtitle">A clearer view of time, cost, and carbon.</p></div>
+          <button id="comparison-close" class="comparison-close" type="button" aria-label="Close visual route comparison">×</button>
+        </div>
+        <div class="comparison-tabs" role="tablist" aria-label="Route comparison chart">
+          <button class="comparison-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="time-chart-panel" data-chart="time">Time Comparison</button>
+          <button class="comparison-tab" type="button" role="tab" aria-selected="false" aria-controls="cost-chart-panel" data-chart="cost">Cost Comparison</button>
+          <button class="comparison-tab" type="button" role="tab" aria-selected="false" aria-controls="emissions-chart-panel" data-chart="emissions">CO₂ Footprint</button>
+        </div>
+        <div class="chart-panel" id="time-chart-panel" role="tabpanel"><canvas id="timeChart" aria-label="Horizontal bar chart comparing route durations"></canvas></div>
+        <div class="chart-panel" id="cost-chart-panel" role="tabpanel" hidden><canvas id="costChart" aria-label="Bar chart comparing route costs"></canvas></div>
+        <div class="chart-panel" id="emissions-chart-panel" role="tabpanel" hidden><canvas id="emissionsChart" aria-label="Grouped bar chart comparing route and private car emissions"></canvas></div>
+        <p class="comparison-note">Estimates are based on current PuneCentric route and emissions models.</p>
       </section>
     </main>
   </body>

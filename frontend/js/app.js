@@ -104,6 +104,7 @@
     const destination = coordinatesOf(state.destination);
     if (!origin || !destination) {
       summary.hidden = true;
+      window.RouteCharts.updateRoutes([]);
       return;
     }
 
@@ -118,6 +119,7 @@
           filterControls.getConstraints(),
         );
         if (currentRequestId !== routeRequestId) return;
+        window.RouteCharts.updateRoutes(candidates);
         if (candidates.length) window.PuneRoutes.renderMap(candidates[0]);
         window.PuneRoutes.renderCandidates(candidates, summary, (candidate) => window.PuneRoutes.renderMap(candidate));
       } else {
@@ -128,11 +130,13 @@
           routeController.signal,
         );
         if (currentRequestId !== routeRequestId) return;
+        window.RouteCharts.updateRoutes([]);
         window.PuneRoutes.renderMap(route);
         window.PuneRoutes.renderSummary(route, state.activeMode, summary);
       }
     } catch (error) {
       if (error.name === "AbortError" || currentRequestId !== routeRequestId) return;
+      window.RouteCharts.updateRoutes([]);
       window.PuneRoutes.clearMapRoutes();
       window.PuneRoutes.renderError(summary, error, state.activeMode);
     }
