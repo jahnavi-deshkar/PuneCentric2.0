@@ -9,6 +9,7 @@ from app.calculations.fares import FareEngine, fare_engine
 from app.calculations.emissions import EmissionEngine, emission_engine
 from app.models.route import LocationPoint, RouteLeg, RouteRequest, RouteResponse
 from app.routing.candidates import CandidateGenerator, RouteCandidate
+from app.routing.cache import route_cache_key, route_response_cache
 from app.routing.constraints import ConstraintFilter, constraint_filter
 from app.routing.pareto import ParetoOptimizer, pareto_optimizer
 from app.transport.bus import BusRouter, bus_router
@@ -44,6 +45,21 @@ class MultimodalRouter:
         self.optimizer = optimizer or pareto_optimizer
 
     def route(self, request: RouteRequest) -> list[RouteResponse]:
+        """Return memoized choices for roughly 11-meter rounded coordinate cells."""
+        constraints = request.constraints.model_dump(mode="json", exclude_none=True) if request.constraints else {}
+        key = route_cache_key(
+            f"multimodal:{id(self)}",
+            request.origin,
+            request.destination,
+            {
+                "constraints": constraints,
+                "origin_label": request.origin.label,
+                "destination_label": request.destination.label,
+            },
+        )
+        return route_response_cache.get_or_compute(key, lambda: self._route_uncached(request))
+
+    def _route_uncached(self, request: RouteRequest) -> list[RouteResponse]:
         candidates = self.generator.generate(request)
         candidates.extend(self._bus_metro_candidates(request))
         candidates = self._deduplicate(candidates)

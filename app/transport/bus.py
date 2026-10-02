@@ -12,6 +12,7 @@ from app.calculations.fares import FareEngine, fare_engine
 from app.calculations.emissions import EmissionEngine, emission_engine
 from app.models.route import LocationPoint, RouteLeg, RouteRequest, RouteResponse
 from app.models.transit import BusLeg, BusRoute, BusStop
+from app.routing.cache import SpatialPointIndex
 from app.transport.walking import WALKING_SPEED_KMH, WalkingRouter, walking_router
 
 LOGGER = logging.getLogger(__name__)
@@ -78,6 +79,7 @@ class BusRouter:
         walking_radius_meters: float = WALKING_RADIUS_METERS,
         fares: FareEngine | None = None,
         emissions: EmissionEngine | None = None,
+        spatial_index_path: Path | str | None = None,
     ) -> None:
         self.network_path = Path(network_path)
         self.walking = walking or walking_router
@@ -85,6 +87,18 @@ class BusRouter:
         self.fares = fares or fare_engine
         self.emissions = emissions or emission_engine
         self.routes = self._load_routes()
+        self.stops_by_id = {stop.id: stop for route in self.routes for stop in route.stops}
+        records = [
+            {"id": stop.id, "name": stop.name, "lat": stop.lat, "lng": stop.lng}
+            for stop in self.stops_by_id.values()
+        ]
+        self.spatial_index_path = Path(spatial_index_path) if spatial_index_path else (
+            self.network_path.parent / "bus_spatial_index.json"
+        )
+        identity = f"bus:{self.network_path.resolve()}:{len(records)}"
+        self.stop_index = SpatialPointIndex.from_json(
+            self.spatial_index_path, records, namespace=identity
+        )
 
     def _load_routes(self) -> list[BusRoute]:
         try:
@@ -101,17 +115,31 @@ class BusRouter:
         return haversine_distance_meters((point.lat, point.lng), (stop.lat, stop.lng))
 
     def _select_bus_leg(self, request: RouteRequest) -> tuple[BusLeg, float, float, BusStop, BusStop] | None:
+        origin_distances = {
+            self.stop_index.records[index]["id"]: distance
+            for distance, index in self.stop_index.query_radius(
+                request.origin.lat, request.origin.lng, self.walking_radius_meters
+            )
+        }
+        destination_distances = {
+            self.stop_index.records[index]["id"]: distance
+            for distance, index in self.stop_index.query_radius(
+                request.destination.lat, request.destination.lng, self.walking_radius_meters
+            )
+        }
+        if not origin_distances or not destination_distances:
+            return None
         best: tuple[tuple[float, float, float], BusLeg, float, float, BusStop, BusStop] | None = None
         for route in self.routes:
             for board_index, board_stop in enumerate(route.stops):
-                origin_walk_m = self._stop_distance(request.origin, board_stop)
-                if origin_walk_m > self.walking_radius_meters:
+                origin_walk_m = origin_distances.get(board_stop.id)
+                if origin_walk_m is None:
                     continue
                 for alight_index, alight_stop in enumerate(route.stops):
                     if alight_index <= board_index:
                         continue
-                    destination_walk_m = self._stop_distance(request.destination, alight_stop)
-                    if destination_walk_m > self.walking_radius_meters:
+                    destination_walk_m = destination_distances.get(alight_stop.id)
+                    if destination_walk_m is None:
                         continue
                     transit_stops = route.stops[board_index : alight_index + 1]
                     coordinates = [(stop.lat, stop.lng) for stop in transit_stops]

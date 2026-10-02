@@ -14,6 +14,7 @@ from app.calculations.fares import FareEngine, fare_engine
 from app.calculations.emissions import EmissionEngine, emission_engine
 from app.models.route import LocationPoint, RouteLeg, RouteRequest, RouteResponse
 from app.models.transit import MetroLeg, MetroLine, MetroStation
+from app.routing.cache import SpatialPointIndex
 from app.transport.walking import WALKING_SPEED_KMH, WalkingRouter, walking_router
 
 LOGGER = logging.getLogger(__name__)
@@ -35,6 +36,7 @@ class MetroRouter:
         access_radius_meters: float = ACCESS_RADIUS_METERS,
         fares: FareEngine | None = None,
         emissions: EmissionEngine | None = None,
+        spatial_index_path: Path | str | None = None,
     ) -> None:
         self.network_path = Path(network_path)
         self.walking = walking or walking_router
@@ -45,6 +47,20 @@ class MetroRouter:
         self.lines: dict[str, MetroLine] = {}
         self.graph = nx.Graph()
         self._load_network()
+        station_records = [
+            {"id": station.id, "name": station.name, "lat": station.lat, "lng": station.lng}
+            for station in self.stations.values()
+        ]
+        self.spatial_index_path = Path(spatial_index_path) if spatial_index_path else (
+            self.network_path.parent / "metro_spatial_index.json"
+        )
+        identity = f"metro:{self.network_path.resolve()}:{len(station_records)}"
+        self.station_index = SpatialPointIndex.from_json(
+            self.spatial_index_path, station_records, namespace=identity
+        )
+        self.nodes_by_station: dict[str, list[tuple[str, str]]] = {}
+        for node in self.graph.nodes:
+            self.nodes_by_station.setdefault(node[1], []).append(node)
 
     def _load_network(self) -> None:
         try:
@@ -82,14 +98,13 @@ class MetroRouter:
                 self.graph.add_edge(first, second, distance_m=0.0, transfer=True, station_id=station_id)
 
     def _nearby_nodes(self, point: LocationPoint) -> list[tuple[float, tuple[str, str]]]:
-        point_coords = (point.lat, point.lng)
         candidates = []
-        for node, data in self.graph.nodes(data=True):
-            station: MetroStation = data["station"]
-            distance = haversine_distance_meters(point_coords, (station.lat, station.lng))
-            if distance <= self.access_radius_meters:
-                candidates.append((distance, node))
-        return sorted(candidates, key=lambda item: item[0])
+        for distance, index in self.station_index.query_radius(
+            point.lat, point.lng, self.access_radius_meters
+        ):
+            station_id = str(self.station_index.records[index]["id"])
+            candidates.extend((distance, node) for node in self.nodes_by_station.get(station_id, []))
+        return candidates
 
     def _journey_parts(self, path: list[tuple[str, str]]) -> list[dict[str, Any]]:
         if not path:
