@@ -9,12 +9,13 @@ from app.calculations.fares import FareEngine, fare_engine
 from app.calculations.emissions import EmissionEngine, emission_engine
 from app.models.route import LocationPoint, RouteLeg, RouteRequest, RouteResponse
 from app.routing.candidates import CandidateGenerator, RouteCandidate
+from app.routing.constraints import ConstraintFilter, constraint_filter
+from app.routing.pareto import ParetoOptimizer, pareto_optimizer
 from app.transport.bus import BusRouter, bus_router
 from app.transport.metro import MetroRouter, metro_router
 from app.transport.walking import WalkingRouter, walking_router
 
 LOGGER = logging.getLogger(__name__)
-MAX_CANDIDATES = 8
 TRANSFER_WALK_LIMIT_METERS = 900.0
 TRANSFER_PENALTY_MINUTES = 4.0
 
@@ -30,6 +31,8 @@ class MultimodalRouter:
         metro: MetroRouter | None = None,
         fares: FareEngine | None = None,
         emissions: EmissionEngine | None = None,
+        constraints_filter: ConstraintFilter | None = None,
+        optimizer: ParetoOptimizer | None = None,
     ) -> None:
         self.emissions = emissions or emission_engine
         self.generator = generator or CandidateGenerator(emissions=self.emissions)
@@ -37,35 +40,19 @@ class MultimodalRouter:
         self.bus = bus or bus_router
         self.metro = metro or metro_router
         self.fares = fares or fare_engine
+        self.constraints_filter = constraints_filter or constraint_filter
+        self.optimizer = optimizer or pareto_optimizer
 
     def route(self, request: RouteRequest) -> list[RouteResponse]:
         candidates = self.generator.generate(request)
         candidates.extend(self._bus_metro_candidates(request))
         candidates = self._deduplicate(candidates)
         candidates = self._filter_inefficient_walks(candidates)
-        candidates.sort(key=lambda item: (
-            item.total_duration_min,
-            item.total_fare_inr,
-            item.total_co2_grams,
-            item.total_distance_km,
-        ))
-        # Keep direct mode comparisons visible even when several connector or
-        # transfer variants rank ahead of them on duration.
-        selected: list[RouteCandidate] = candidates[:1]
-        direct_ids = {"walking-direct", "auto-direct", "bus-direct", "metro-direct"}
-        for candidate in candidates:
-            if candidate.candidate_id in direct_ids and candidate not in selected:
-                selected.append(candidate)
-        for candidate in candidates:
-            if candidate not in selected and len(selected) < MAX_CANDIDATES:
-                selected.append(candidate)
-        selected.sort(key=lambda item: (
-            item.total_duration_min,
-            item.total_fare_inr,
-            item.total_co2_grams,
-            item.total_distance_km,
-        ))
-        return [candidate.as_response() for candidate in selected[:MAX_CANDIDATES]]
+        candidates = self.constraints_filter.filter_candidates(candidates, request.constraints)
+        # Pareto filtering removes options that are no better on any of the
+        # four user-facing objectives; every remaining route is useful tradeoff.
+        selected = self.optimizer.optimize(candidates)
+        return [candidate.as_response() for candidate in selected]
 
     def _bus_metro_candidates(self, request: RouteRequest) -> list[RouteCandidate]:
         """Try one bus-to-metro transfer where a bus alighting stop meets a station."""

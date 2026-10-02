@@ -18,13 +18,14 @@
     return body;
   }
 
-  async function fetchCandidates(origin, destination, signal) {
+  async function fetchCandidates(origin, destination, signal, constraints = {}) {
     const response = await fetch("/api/routes/multimodal", {
       method: "POST",
       headers: { "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify({
         origin: { lat: origin.lat, lng: origin.lng, label: origin.label || origin.name },
         destination: { lat: destination.lat, lng: destination.lng, label: destination.label || destination.name },
+        constraints,
       }),
       signal,
     });
@@ -298,7 +299,7 @@
     if (!routes.length) {
       const empty = document.createElement("p");
       empty.className = "candidate-empty";
-      empty.textContent = "No route options could be assembled for these places.";
+      empty.textContent = "No routes meet these limits. Try increasing your budget, walking allowance, or transfer limit.";
       container.append(empty);
       container.hidden = false;
       return;
@@ -315,7 +316,7 @@
       name.textContent = route.candidate_name || route.candidate_id || "Journey option";
       const badge = document.createElement("span");
       badge.className = "candidate-badge";
-      badge.textContent = index === 0 ? "Fastest" : `${route.transfers_count || 0} transfers`;
+      badge.textContent = route.preference_tags?.[0] || `${route.transfers_count || 0} transfers`;
       const selectButton = document.createElement("button");
       selectButton.type = "button";
       selectButton.className = "candidate-select";
@@ -362,7 +363,19 @@
         timeline.append(item);
       });
       const fareDetails = fareAccordion(route);
-      card.append(heading, ecoPill(route), metrics, timeline);
+      card.append(heading, ecoPill(route));
+      if (Array.isArray(route.preference_tags) && route.preference_tags.length) {
+        const preferences = document.createElement("div");
+        preferences.className = "pareto-tags";
+        route.preference_tags.forEach((tag) => {
+          const pill = document.createElement("span");
+          pill.className = "pareto-tag";
+          pill.textContent = tag;
+          preferences.append(pill);
+        });
+        card.append(preferences);
+      }
+      card.append(metrics, timeline);
       if (fareDetails) card.append(fareDetails);
       card.append(environmentalSection(route));
       const selectCard = () => {

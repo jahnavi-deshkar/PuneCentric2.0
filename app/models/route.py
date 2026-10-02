@@ -19,6 +19,17 @@ class RouteRequest(BaseModel):
 
     origin: LocationPoint
     destination: LocationPoint
+    constraints: "RouteConstraints | None" = None
+
+
+class RouteConstraints(BaseModel):
+    """Optional hard limits applied to multimodal route candidates."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    max_budget_inr: float | None = Field(default=None, ge=0)
+    max_walk_distance_km: float | None = Field(default=None, ge=0)
+    max_transfers: int | None = Field(default=None, ge=0)
 
 
 class FareBreakdown(BaseModel):
@@ -78,6 +89,7 @@ class RouteResponse(BaseModel):
     legs: list[RouteLeg]
     candidate_id: str | None = None
     candidate_name: str | None = None
+    preference_tags: list[str] = Field(default_factory=list)
     transfers_count: int = Field(default=0, ge=0)
     walk_distance_km: float = Field(default=0, ge=0)
     fare_breakdown: FareBreakdown | None = None

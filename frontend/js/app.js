@@ -115,6 +115,7 @@
           { ...origin, label: state.origin.name },
           { ...destination, label: state.destination.name },
           routeController.signal,
+          filterControls.getConstraints(),
         );
         if (currentRequestId !== routeRequestId) return;
         if (candidates.length) window.PuneRoutes.renderMap(candidates[0]);
@@ -144,6 +145,11 @@
         return;
       }
       setPlace(key, place);
+    },
+  });
+  const filterControls = window.PuneFilters.init({
+    onChange() {
+      if (state.activeMode === "multimodal" && state.origin && state.destination) refreshActiveRoute();
     },
   });
 

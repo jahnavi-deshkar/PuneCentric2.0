@@ -14,7 +14,7 @@ router = APIRouter()
 
 @router.post("/routes/multimodal", response_model=list[RouteResponse])
 def multimodal_route(request: RouteRequest) -> list[RouteResponse]:
-    """Return ranked walking, auto, bus, metro, and composite route choices."""
+    """Apply optional hard constraints, then return the Pareto-optimal route choices."""
     return multimodal_router.route(request)
 
 
