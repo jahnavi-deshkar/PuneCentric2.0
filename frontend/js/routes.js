@@ -37,6 +37,8 @@
         style = { color: "#397eae", weight: 5, opacity: 0.95, lineCap: "round", lineJoin: "round" };
       } else if (leg.mode === "metro") {
         style = { color: leg.line_color || "#008B8B", weight: 5, opacity: 0.96, lineCap: "round", lineJoin: "round" };
+      } else if (leg.mode === "auto") {
+        style = { color: "#E65100", weight: 5, opacity: 0.96, lineCap: "round", lineJoin: "round" };
       } else {
         style = { color: "#47674d", weight: 5, opacity: 0.9, lineCap: "round", lineJoin: "round" };
       }
@@ -73,13 +75,13 @@
     const intro = document.createElement("div");
     const kicker = document.createElement("p");
     kicker.className = "route-summary-kicker";
-    kicker.textContent = mode === "bus" ? "PMPML bus · estimate" : mode === "metro" ? "Pune Metro · estimate" : "Walking · estimate";
+    kicker.textContent = mode === "bus" ? "PMPML bus · estimate" : mode === "metro" ? "Pune Metro · estimate" : mode === "auto" ? "Auto-rickshaw · estimate" : "Walking · estimate";
     const title = document.createElement("h2");
     title.className = "route-summary-title";
-    title.textContent = mode === "bus" ? "Bus journey" : mode === "metro" ? "Metro journey" : "Walking route";
+    title.textContent = mode === "bus" ? "Bus journey" : mode === "metro" ? "Metro journey" : mode === "auto" ? "Auto ride" : "Walking route";
     const caption = document.createElement("p");
     caption.className = "route-summary-caption";
-    caption.textContent = mode === "bus" ? "Walk · ride · walk" : mode === "metro" ? "Walk · metro · walk" : "At an average pace of 4.5 km/h";
+    caption.textContent = mode === "bus" ? "Walk · ride · walk" : mode === "metro" ? "Walk · metro · walk" : mode === "auto" ? "Direct road journey · fare estimate" : "At an average pace of 4.5 km/h";
     intro.append(kicker, title, caption);
     heading.append(intro);
     container.append(heading);
@@ -94,6 +96,27 @@
           ["Board", busLeg.board_stop?.name || "—"],
           ["Alight", busLeg.alight_stop?.name || "—"],
         ].forEach(([label, value]) => {
+          const row = document.createElement("div");
+          const term = document.createElement("dt");
+          term.textContent = label;
+          const description = document.createElement("dd");
+          description.textContent = value;
+          row.append(term, description);
+          details.append(row);
+        });
+        container.append(details);
+      }
+    } else if (mode === "auto") {
+      const autoLeg = (route.legs || []).find((leg) => leg.mode === "auto");
+      if (autoLeg) {
+        const details = document.createElement("dl");
+        details.className = "auto-fare-details";
+        const rows = [
+          ["Base · first 1.5 km", `₹${Number(autoLeg.fare_base_inr || 0).toFixed(2)}`],
+          [`Distance · ₹${Number(autoLeg.fare_rate_per_km || 0).toFixed(0)}/km`, `₹${Number(autoLeg.fare_distance_inr || 0).toFixed(2)}`],
+          ["Night surcharge · 25%", autoLeg.night_surcharge_applied ? `₹${Number(autoLeg.fare_night_surcharge_inr || 0).toFixed(2)}` : "Not applied"],
+        ];
+        rows.forEach(([label, value]) => {
           const row = document.createElement("div");
           const term = document.createElement("dt");
           term.textContent = label;
@@ -156,7 +179,7 @@
     container.replaceChildren();
     const kicker = document.createElement("p");
     kicker.className = "route-summary-kicker";
-    kicker.textContent = mode === "bus" ? "PMPML bus" : mode === "metro" ? "Pune Metro" : "Walking";
+    kicker.textContent = mode === "bus" ? "PMPML bus" : mode === "metro" ? "Pune Metro" : mode === "auto" ? "Auto-rickshaw" : "Walking";
     const title = document.createElement("h2");
     title.className = "route-summary-title";
     title.textContent = "Route unavailable";

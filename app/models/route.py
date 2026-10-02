@@ -37,6 +37,13 @@ class RouteLeg(BaseModel):
     board_station: MetroStation | None = None
     alight_station: MetroStation | None = None
     transfer_station: MetroStation | None = None
+    # Auto fare components are populated only for auto-rickshaw legs.
+    fare_base_inr: float | None = Field(default=None, ge=0)
+    fare_distance_inr: float | None = Field(default=None, ge=0)
+    fare_night_surcharge_inr: float | None = Field(default=None, ge=0)
+    fare_rate_per_km: float | None = Field(default=None, ge=0)
+    night_surcharge_applied: bool = False
+    fare_currency: str | None = None
 
 
 class RouteResponse(BaseModel):

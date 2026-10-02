@@ -1,9 +1,10 @@
 """Route-planning API endpoints."""
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 
 from app.models.route import RouteRequest, RouteResponse
 from app.transport.bus import bus_router
+from app.transport.auto import auto_router
 from app.transport.metro import metro_router
 from app.transport.walking import walking_router
 
@@ -32,3 +33,18 @@ def metro_route(request: RouteRequest) -> RouteResponse:
         return metro_router.route(request)
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@router.post("/routes/auto", response_model=RouteResponse)
+def auto_route(
+    request: RouteRequest,
+    night_surcharge: bool | None = Query(
+        default=None,
+        description="Override night pricing; omitted means apply it automatically from 00:00–05:00 Pune time.",
+    ),
+) -> RouteResponse:
+    """Calculate a direct auto-rickshaw route and fare estimate."""
+    try:
+        return auto_router.route(request, night_surcharge=night_surcharge)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
