@@ -251,3 +251,271 @@ h1 em { color: var(--green); font-weight: 500; }
   .route-results-heading .route-summary-title { max-width: 58%; font-size: 21px; }
   .visual-analytics-toggle { font-size: 8px; }
 }
+
+/* Mobile: keep the map as a full-screen canvas and stack route UI in a sheet. */
+@media (max-width: 768px) {
+  html,
+  body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .map-experience {
+    display: flex;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 100vh;
+    min-height: 100dvh;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: calc(61px + env(safe-area-inset-top) + 76px) 16px calc(16px + env(safe-area-inset-bottom));
+    overscroll-behavior-y: contain;
+    scroll-padding-top: calc(61px + env(safe-area-inset-top));
+  }
+
+  #map {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+  }
+
+  .map-header {
+    position: fixed;
+    z-index: 1200;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: calc(61px + env(safe-area-inset-top));
+    padding: env(safe-area-inset-top) 16px 0;
+  }
+
+  .control-panel {
+    position: relative !important;
+    z-index: 520 !important;
+    inset: auto !important;
+    flex: 0 0 auto;
+    align-self: center;
+    width: calc(100vw - 32px) !important;
+    max-width: 560px;
+    max-height: 85vh;
+    max-height: 85dvh;
+    margin: 0 auto;
+    padding: 12px 16px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    border-radius: 8px;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .panel-heading {
+    margin-bottom: 12px;
+  }
+
+  .eyebrow {
+    margin-bottom: 7px;
+  }
+
+  h1 {
+    font-size: clamp(25px, 7vw, 30px);
+  }
+
+  .panel-intro {
+    margin-top: 5px;
+    font-size: 11px;
+  }
+
+  .mode-tabs {
+    margin: 10px 0;
+  }
+
+  .mode-tab {
+    min-width: 0;
+    padding-inline: 2px;
+    font-size: 10px;
+  }
+
+  .filter-tools {
+    z-index: 20;
+  }
+
+  .filter-drawer {
+    z-index: 100;
+    width: min(340px, calc(100vw - 48px));
+    max-height: 60dvh;
+    overflow-y: auto;
+  }
+
+  .search-field {
+    height: 46px;
+  }
+
+  .suggestions {
+    z-index: 110;
+    max-height: min(34vh, 260px);
+  }
+
+  .panel-actions {
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 10px;
+  }
+
+  .swap-button,
+  .quick-button {
+    min-height: 34px;
+    padding-inline: 7px;
+    font-size: 9px;
+  }
+
+  .quick-button {
+    gap: 4px;
+  }
+
+  .swap-button svg,
+  .quick-button svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  .selection-status {
+    gap: 5px;
+    margin-top: 10px;
+    padding-top: 10px;
+  }
+
+  .selection-chip {
+    min-height: 25px;
+    font-size: 9px;
+  }
+
+  .panel-hint {
+    margin-top: 7px;
+    font-size: 9px;
+  }
+
+  /* app.js injects desktop positioning for this dynamically created panel. */
+  .route-summary {
+    position: relative !important;
+    z-index: 510 !important;
+    inset: auto !important;
+    flex: 0 0 auto;
+    align-self: center;
+    width: calc(100vw - 32px) !important;
+    max-width: 560px !important;
+    max-height: 85vh !important;
+    max-height: 85dvh !important;
+    margin: 0 auto !important;
+    padding: 12px 16px !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    border-radius: 8px;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .route-summary[hidden] {
+    display: none !important;
+  }
+
+  .route-summary-title {
+    font-size: 21px;
+  }
+
+  .route-summary-metrics {
+    gap: 8px 10px;
+    margin-top: 10px;
+    padding-top: 10px;
+  }
+
+  .route-metric-value {
+    font-size: 12px;
+  }
+
+  .candidate-list {
+    max-height: min(42vh, 360px);
+  }
+
+  .candidate-card {
+    padding: 10px 11px;
+  }
+
+  .comparison-drawer {
+    position: fixed;
+    z-index: 1400;
+    top: calc(73px + env(safe-area-inset-top));
+    right: 16px;
+    bottom: calc(16px + env(safe-area-inset-bottom));
+    left: 16px;
+    width: auto;
+    min-width: 0;
+    max-width: 560px;
+    max-height: none;
+    margin-inline: auto;
+    padding: 12px 16px;
+    overflow-y: auto;
+  }
+
+  .comparison-drawer[hidden] {
+    display: none !important;
+  }
+
+  .comparison-heading h2 {
+    font-size: 22px;
+  }
+
+  .comparison-tabs {
+    margin: 11px 0 8px;
+  }
+
+  .comparison-tab {
+    min-height: 38px;
+    font-size: 8px;
+  }
+
+  .chart-panel {
+    height: min(38vh, 300px);
+  }
+
+  /* Keep the zoom buttons in the clear strip between the header and sheet. */
+  .leaflet-bottom.leaflet-right {
+    top: calc(61px + env(safe-area-inset-top) + 7px);
+    right: 8px;
+    bottom: auto;
+  }
+
+  .leaflet-bottom.leaflet-right .leaflet-control-zoom {
+    margin: 0 !important;
+  }
+
+  .leaflet-bottom.leaflet-right .leaflet-control-attribution {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+  }
+}
+
+@media (max-width: 380px) {
+  .map-experience {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .control-panel,
+  .route-summary {
+    width: calc(100vw - 24px) !important;
+  }
+
+  .quick-button {
+    font-size: 8px;
+  }
+
+  .action-divider {
+    display: none;
+  }
+}
