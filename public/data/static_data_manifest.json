@@ -1,0 +1,20 @@
+{
+  "datasets": {
+    "pune_bus_network.json": {
+      "records": 52,
+      "sha256": "579698cdf48482d3d1ea76fa4195cb59f2e67c66645ec42772d38f3729ff8213",
+      "size_bytes": 4933
+    },
+    "pune_locations.json": {
+      "records": 32,
+      "sha256": "0abd5f2f2592ff26a98fcd40ffe38fc229c927209d9c23753aa9f1cc59596fd0",
+      "size_bytes": 5658
+    },
+    "pune_metro_network.json": {
+      "records": 29,
+      "sha256": "14c08a857c88dd4cd9e495a64eaacc358020a40bb447f83ae51ea93f1cdfbcb1",
+      "size_bytes": 2988
+    }
+  },
+  "schema_version": 1
+}

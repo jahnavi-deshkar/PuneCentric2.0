@@ -27,5 +27,13 @@ dev = ["pytest>=8.3,<9.0", "requests>=2.32,<3.0", "httpx2"]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 
+# Vercel runs this after installing the project dependencies. The generated
+# JSON files are mounted by FastAPI and can be promoted to Vercel's static CDN.
+[tool.vercel.scripts]
+build = "python scripts/build_static_data.py"
+
+[tool.vercel.fastapi.static]
+cdn = true
+
 [tool.setuptools.packages.find]
 include = ["app*"]

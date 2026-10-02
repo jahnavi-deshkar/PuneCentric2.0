@@ -1,4 +1,5 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
   "builds": [
     {
@@ -10,10 +11,26 @@
     {
       "src": "/api/(.*)",
       "dest": "app/main.py"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/data/(.*\\.json)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, immutable"
+        }
+      ]
     },
     {
-      "src": "/(.*)",
-      "dest": "app/main.py"
+      "source": "/data/(.*\\.geojson)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, immutable"
+        }
+      ]
     }
   ]
 }

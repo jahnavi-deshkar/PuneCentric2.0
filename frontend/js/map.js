@@ -4,10 +4,10 @@
   const PUNE_CENTER = [18.5204, 73.8567];
   const map = L.map("map", { zoomControl: false, preferCanvas: true }).setView(PUNE_CENTER, 12);
 
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    subdomains: "abcd",
-    maxZoom: 20,
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
+    subdomains: "abc",
+    maxZoom: 19,
   }).addTo(map);
   L.control.zoom({ position: "bottomright" }).addTo(map);
 
