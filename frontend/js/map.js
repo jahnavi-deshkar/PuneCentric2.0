@@ -5,7 +5,7 @@
   const map = L.map("map", { zoomControl: false, preferCanvas: true }).setView(PUNE_CENTER, 12);
 
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     subdomains: "abc",
     maxZoom: 19,
   }).addTo(map);
