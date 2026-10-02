@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict, Field
-from app.models.transit import BusStop
+from app.models.transit import BusStop, MetroStation
 
 
 class LocationPoint(BaseModel):
@@ -31,6 +31,12 @@ class RouteLeg(BaseModel):
     route_name: str | None = None
     board_stop: BusStop | None = None
     alight_stop: BusStop | None = None
+    line_id: str | None = None
+    line_name: str | None = None
+    line_color: str | None = None
+    board_station: MetroStation | None = None
+    alight_station: MetroStation | None = None
+    transfer_station: MetroStation | None = None
 
 
 class RouteResponse(BaseModel):

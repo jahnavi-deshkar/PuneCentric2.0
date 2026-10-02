@@ -28,12 +28,15 @@
     if (!map.hasLayer(routeLayer)) routeLayer.addTo(map);
     const lines = [];
     (route.legs || []).forEach((leg) => {
+      if (leg.mode === "transfer") return;
       if (!Array.isArray(leg.geometry) || leg.geometry.length < 2) return;
       let style;
-      if (route.mode === "bus" && leg.mode === "walking") {
+      if ((route.mode === "bus" || route.mode === "metro") && leg.mode === "walking") {
         style = { color: "#888f89", weight: 4, opacity: 0.9, dashArray: "7 8", lineCap: "round", lineJoin: "round" };
       } else if (leg.mode === "bus") {
         style = { color: "#397eae", weight: 5, opacity: 0.95, lineCap: "round", lineJoin: "round" };
+      } else if (leg.mode === "metro") {
+        style = { color: leg.line_color || "#008B8B", weight: 5, opacity: 0.96, lineCap: "round", lineJoin: "round" };
       } else {
         style = { color: "#47674d", weight: 5, opacity: 0.9, lineCap: "round", lineJoin: "round" };
       }
@@ -70,13 +73,13 @@
     const intro = document.createElement("div");
     const kicker = document.createElement("p");
     kicker.className = "route-summary-kicker";
-    kicker.textContent = mode === "bus" ? "PMPML bus · estimate" : "Walking · estimate";
+    kicker.textContent = mode === "bus" ? "PMPML bus · estimate" : mode === "metro" ? "Pune Metro · estimate" : "Walking · estimate";
     const title = document.createElement("h2");
     title.className = "route-summary-title";
-    title.textContent = mode === "bus" ? "Bus journey" : "Walking route";
+    title.textContent = mode === "bus" ? "Bus journey" : mode === "metro" ? "Metro journey" : "Walking route";
     const caption = document.createElement("p");
     caption.className = "route-summary-caption";
-    caption.textContent = mode === "bus" ? "Walk · ride · walk" : "At an average pace of 4.5 km/h";
+    caption.textContent = mode === "bus" ? "Walk · ride · walk" : mode === "metro" ? "Walk · metro · walk" : "At an average pace of 4.5 km/h";
     intro.append(kicker, title, caption);
     heading.append(intro);
     container.append(heading);
@@ -101,6 +104,41 @@
         });
         container.append(details);
       }
+    } else if (mode === "metro") {
+      const details = document.createElement("div");
+      details.className = "metro-route-details";
+      (route.legs || []).forEach((leg) => {
+        if (leg.mode === "transfer") {
+          const warning = document.createElement("div");
+          warning.className = "metro-interchange-note";
+          warning.textContent = `⇄ Change at ${leg.transfer_station?.name || "Civil Court"} · allow 3 min`;
+          details.append(warning);
+          return;
+        }
+        if (leg.mode !== "metro") return;
+        const item = document.createElement("div");
+        item.className = "metro-leg-detail";
+        const lineHeading = document.createElement("div");
+        lineHeading.className = "metro-line-heading";
+        const swatch = document.createElement("span");
+        swatch.className = "metro-line-swatch";
+        swatch.style.backgroundColor = leg.line_color || "#008B8B";
+        const lineName = document.createElement("span");
+        lineName.textContent = leg.line_name || "Metro line";
+        lineHeading.append(swatch, lineName);
+        const pair = document.createElement("div");
+        pair.className = "metro-station-pair";
+        const board = document.createElement("span");
+        board.textContent = leg.board_station?.name || "Boarding station";
+        const arrow = document.createElement("span");
+        arrow.textContent = "→";
+        const alight = document.createElement("span");
+        alight.textContent = leg.alight_station?.name || "Alighting station";
+        pair.append(board, arrow, alight);
+        item.append(lineHeading, pair);
+        details.append(item);
+      });
+      if (details.childElementCount) container.append(details);
     }
 
     const grid = document.createElement("div");
@@ -118,7 +156,7 @@
     container.replaceChildren();
     const kicker = document.createElement("p");
     kicker.className = "route-summary-kicker";
-    kicker.textContent = mode === "bus" ? "PMPML bus" : "Walking";
+    kicker.textContent = mode === "bus" ? "PMPML bus" : mode === "metro" ? "Pune Metro" : "Walking";
     const title = document.createElement("h2");
     title.className = "route-summary-title";
     title.textContent = "Route unavailable";

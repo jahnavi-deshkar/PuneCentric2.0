@@ -1,0 +1,239 @@
+{
+  "network_name": "Pune Metro Phase I",
+  "coordinate_source": "Curated public-map station-area anchors; approximate WGS84",
+  "coordinate_accuracy_note": "Approximate station locations; not survey-grade platform coordinates.",
+  "approximate_coordinates": true,
+  "lines": [
+    {
+      "line_id": "purple",
+      "line_name": "Purple Line · Line 1",
+      "line_color": "#8A2BE2",
+      "route_sequence": [
+        "pcmc",
+        "sant-tukaram-nagar",
+        "bhosari",
+        "kasarwadi",
+        "phugewadi",
+        "dapodi",
+        "bopodi",
+        "khadki",
+        "range-hill",
+        "shivajinagar",
+        "civil-court",
+        "budhwar-peth",
+        "mandai",
+        "swargate"
+      ]
+    },
+    {
+      "line_id": "aqua",
+      "line_name": "Aqua Line · Line 2",
+      "line_color": "#008B8B",
+      "route_sequence": [
+        "vanaz",
+        "anand-nagar",
+        "ideal-colony",
+        "nal-stop",
+        "garware-college",
+        "deccan-gymkhana",
+        "sambhaji-udyan",
+        "pmc",
+        "civil-court",
+        "mangalwar-peth",
+        "pune-railway-station",
+        "ruby-hall-clinic",
+        "bund-garden",
+        "yerwada",
+        "kalyani-nagar",
+        "ramwadi"
+      ]
+    }
+  ],
+  "stations": [
+    {
+      "id": "pcmc",
+      "name": "PCMC",
+      "lat": 18.6298,
+      "lng": 73.7997
+    },
+    {
+      "id": "sant-tukaram-nagar",
+      "name": "Sant Tukaram Nagar",
+      "lat": 18.6182,
+      "lng": 73.8132
+    },
+    {
+      "id": "bhosari",
+      "name": "Bhosari",
+      "lat": 18.609,
+      "lng": 73.8216
+    },
+    {
+      "id": "kasarwadi",
+      "name": "Kasarwadi",
+      "lat": 18.6016,
+      "lng": 73.8195
+    },
+    {
+      "id": "phugewadi",
+      "name": "Phugewadi",
+      "lat": 18.5909,
+      "lng": 73.8248
+    },
+    {
+      "id": "dapodi",
+      "name": "Dapodi",
+      "lat": 18.5804,
+      "lng": 73.8304
+    },
+    {
+      "id": "bopodi",
+      "name": "Bopodi",
+      "lat": 18.5727,
+      "lng": 73.8315
+    },
+    {
+      "id": "khadki",
+      "name": "Khadki",
+      "lat": 18.5619,
+      "lng": 73.8327
+    },
+    {
+      "id": "range-hill",
+      "name": "Range Hill",
+      "lat": 18.5487,
+      "lng": 73.8327
+    },
+    {
+      "id": "shivajinagar",
+      "name": "Shivajinagar",
+      "lat": 18.5308,
+      "lng": 73.8475
+    },
+    {
+      "id": "civil-court",
+      "name": "Civil Court",
+      "lat": 18.52709,
+      "lng": 73.85741
+    },
+    {
+      "id": "budhwar-peth",
+      "name": "Budhwar Peth",
+      "lat": 18.5182,
+      "lng": 73.8567
+    },
+    {
+      "id": "mandai",
+      "name": "Mandai",
+      "lat": 18.5102,
+      "lng": 73.856
+    },
+    {
+      "id": "swargate",
+      "name": "Swargate",
+      "lat": 18.5018,
+      "lng": 73.8636
+    },
+    {
+      "id": "vanaz",
+      "name": "Vanaz",
+      "lat": 18.5071,
+      "lng": 73.80527
+    },
+    {
+      "id": "anand-nagar",
+      "name": "Anand Nagar",
+      "lat": 18.5006,
+      "lng": 73.8144
+    },
+    {
+      "id": "ideal-colony",
+      "name": "Ideal Colony",
+      "lat": 18.5073,
+      "lng": 73.8224
+    },
+    {
+      "id": "nal-stop",
+      "name": "Nal Stop",
+      "lat": 18.5096,
+      "lng": 73.8316
+    },
+    {
+      "id": "garware-college",
+      "name": "Garware College",
+      "lat": 18.5155,
+      "lng": 73.8371
+    },
+    {
+      "id": "deccan-gymkhana",
+      "name": "Deccan Gymkhana",
+      "lat": 18.5164,
+      "lng": 73.84
+    },
+    {
+      "id": "sambhaji-udyan",
+      "name": "Chhatrapati Sambhaji Udyan",
+      "lat": 18.5185,
+      "lng": 73.8461
+    },
+    {
+      "id": "pmc",
+      "name": "PMC",
+      "lat": 18.5204,
+      "lng": 73.8567
+    },
+    {
+      "id": "mangalwar-peth",
+      "name": "Mangalwar Peth",
+      "lat": 18.5265,
+      "lng": 73.8664
+    },
+    {
+      "id": "pune-railway-station",
+      "name": "Pune Railway Station",
+      "lat": 18.5289,
+      "lng": 73.8744
+    },
+    {
+      "id": "ruby-hall-clinic",
+      "name": "Ruby Hall Clinic",
+      "lat": 18.5331,
+      "lng": 73.8798
+    },
+    {
+      "id": "bund-garden",
+      "name": "Bund Garden",
+      "lat": 18.5362,
+      "lng": 73.8833
+    },
+    {
+      "id": "yerwada",
+      "name": "Yerwada",
+      "lat": 18.5471,
+      "lng": 73.8787
+    },
+    {
+      "id": "kalyani-nagar",
+      "name": "Kalyani Nagar",
+      "lat": 18.5485,
+      "lng": 73.9005
+    },
+    {
+      "id": "ramwadi",
+      "name": "Ramwadi",
+      "lat": 18.55703,
+      "lng": 73.90856
+    }
+  ],
+  "interchanges": [
+    {
+      "station_id": "civil-court",
+      "station_name": "Civil Court",
+      "line_ids": [
+        "purple",
+        "aqua"
+      ],
+      "transfer_penalty_min": 3.0
+    }
+  ]
+}

@@ -189,7 +189,7 @@
   document.querySelectorAll(".mode-tab").forEach((button) => {
     button.addEventListener("click", () => {
       const mode = button.dataset.mode;
-      if (mode !== "walking" && mode !== "bus") return;
+      if (mode !== "walking" && mode !== "bus" && mode !== "metro") return;
       state.activeMode = mode;
       document.querySelectorAll(".mode-tab").forEach((tab) => {
         const active = tab === button;
