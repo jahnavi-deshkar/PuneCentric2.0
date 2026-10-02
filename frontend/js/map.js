@@ -13,6 +13,7 @@
 
   const markerColors = { origin: "#47674d", destination: "#bd4d49" };
   const markers = { origin: null, destination: null };
+  const routeLayer = L.featureGroup().addTo(map);
   let selectionMode = null;
   let selectionHandler = () => {};
 
@@ -66,6 +67,32 @@
     }
   }
 
+  function renderRoutePolyline(coordinates, modeColor = "#47674d") {
+    clearRoutes();
+    if (!Array.isArray(coordinates) || coordinates.length < 2) return null;
+    const validCoordinates = coordinates.filter((point) => Array.isArray(point) && point.length >= 2 && point.every((value) => Number.isFinite(Number(value))));
+    if (validCoordinates.length < 2) return null;
+    const line = L.polyline(validCoordinates, {
+      color: modeColor,
+      weight: 5,
+      opacity: 0.88,
+      lineCap: "round",
+      lineJoin: "round",
+      smoothFactor: 1.2,
+    }).addTo(routeLayer);
+    const panel = document.querySelector(".control-panel");
+    const isMobile = window.matchMedia("(max-width: 680px)").matches;
+    const panelBounds = panel?.getBoundingClientRect();
+    const paddingTopLeft = isMobile ? [18, 78] : [Math.max(24, (panelBounds?.right || 420) + 18), 88];
+    const paddingBottomRight = isMobile && panelBounds ? [18, Math.max(30, window.innerHeight - panelBounds.top + 18)] : [35, 58];
+    map.fitBounds(line.getBounds(), { paddingTopLeft, paddingBottomRight, maxZoom: 15, animate: true });
+    return line;
+  }
+
+  function clearRoutes() {
+    routeLayer.clearLayers();
+  }
+
   map.on("click", (event) => {
     if (selectionMode) {
       selectionHandler(selectionMode, { lat: event.latlng.lat, lng: event.latlng.lng });
@@ -85,6 +112,8 @@
     setDestinationMarker: (lat, lng, label) => setMarker("destination", lat, lng, label),
     clearMarker,
     fitMapToBounds,
+    renderRoutePolyline,
+    clearRoutes,
     setSelectionMode(mode, handler) {
       selectionMode = mode === "origin" || mode === "destination" ? mode : null;
       selectionHandler = typeof handler === "function" ? handler : () => {};
