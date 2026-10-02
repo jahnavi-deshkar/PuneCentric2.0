@@ -108,6 +108,8 @@ class AutoRouter:
             fare_rate_per_km=PER_KM_FARE_INR,
             night_surcharge_applied=apply_night and fare > 0,
             fare_currency="INR",
+            from_label=request.origin.label,
+            to_label=request.destination.label,
         )
         return RouteResponse(
             mode="auto",

@@ -3,9 +3,9 @@
 (() => {
   const summaryStyles = document.createElement("style");
   summaryStyles.textContent = `
-    .route-summary{position:absolute;z-index:440;right:26px;bottom:26px;width:min(320px,calc(100% - 52px));padding:18px 19px 16px;border:1px solid #ffffffc9;border-radius:7px;background:#fbfaf5e8;box-shadow:0 18px 55px #25291e1a;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);animation:panel-arrive 300ms ease-out both}
+    .route-summary{position:absolute;z-index:440;right:26px;bottom:26px;width:min(360px,calc(100% - 52px));max-height:min(82vh,760px);padding:18px 19px 16px;overflow-y:auto;border:1px solid #ffffffc9;border-radius:7px;background:#fbfaf5e8;box-shadow:0 18px 55px #25291e1a;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);animation:panel-arrive 300ms ease-out both}
     .route-summary[hidden]{display:none}.route-summary-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.route-summary-kicker{margin:0 0 4px;color:#47674d;font-size:9px;font-weight:700;letter-spacing:.13em;text-transform:uppercase}.route-summary-title{margin:0;color:#20251f;font:500 22px/1.15 'Playfair Display',Georgia,serif;letter-spacing:-.04em}.route-summary-caption{margin:5px 0 0;color:#85877e;font-size:10px}.route-summary-loader{color:#74776e;font-size:11px}.route-summary-metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;margin-top:15px;padding-top:13px;border-top:1px solid #e7e5dc}.route-metric-label{display:block;margin-bottom:3px;color:#85877e;font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}.route-metric-value{color:#2a3029;font-size:14px;font-weight:700}.route-summary-error{margin:12px 0 0;color:#a24b45;font-size:10px;line-height:1.45}
-    @media(max-width:680px){.route-summary{top:76px;right:12px;bottom:auto;width:min(250px,calc(100% - 24px));padding:13px 14px}.route-summary-title{font-size:19px}.route-summary-metrics{gap:8px;margin-top:10px;padding-top:10px}.route-metric-value{font-size:12px}}
+    @media(max-width:680px){.route-summary{top:76px;right:12px;bottom:auto;width:min(300px,calc(100% - 24px));max-height:34vh;padding:13px 14px}.route-summary-title{font-size:19px}.route-summary-metrics{gap:8px;margin-top:10px;padding-top:10px}.route-metric-value{font-size:12px}}
   `;
   document.head.append(summaryStyles);
 
@@ -14,7 +14,7 @@
     destination: null,
     activeSelectionMode: null,
     nextMapMode: "origin",
-    activeMode: "walking",
+    activeMode: "multimodal",
     regions: [],
   };
 
@@ -33,7 +33,7 @@
   summary.className = "route-summary";
   summary.id = "route-summary";
   summary.setAttribute("aria-live", "polite");
-  summary.setAttribute("aria-label", "Walking route summary");
+  summary.setAttribute("aria-label", "Multimodal route options");
   summary.hidden = true;
   document.querySelector(".map-experience").append(summary);
   let routeController = null;
@@ -110,15 +110,26 @@
     routeController = new AbortController();
     showRouteLoading();
     try {
-      const route = await window.PuneRoutes.fetchRoute(
-        state.activeMode,
-        { ...origin, label: state.origin.name },
-        { ...destination, label: state.destination.name },
-        routeController.signal,
-      );
-      if (currentRequestId !== routeRequestId) return;
-      window.PuneRoutes.renderMap(route);
-      window.PuneRoutes.renderSummary(route, state.activeMode, summary);
+      if (state.activeMode === "multimodal") {
+        const candidates = await window.PuneRoutes.fetchCandidates(
+          { ...origin, label: state.origin.name },
+          { ...destination, label: state.destination.name },
+          routeController.signal,
+        );
+        if (currentRequestId !== routeRequestId) return;
+        if (candidates.length) window.PuneRoutes.renderMap(candidates[0]);
+        window.PuneRoutes.renderCandidates(candidates, summary, (candidate) => window.PuneRoutes.renderMap(candidate));
+      } else {
+        const route = await window.PuneRoutes.fetchRoute(
+          state.activeMode,
+          { ...origin, label: state.origin.name },
+          { ...destination, label: state.destination.name },
+          routeController.signal,
+        );
+        if (currentRequestId !== routeRequestId) return;
+        window.PuneRoutes.renderMap(route);
+        window.PuneRoutes.renderSummary(route, state.activeMode, summary);
+      }
     } catch (error) {
       if (error.name === "AbortError" || currentRequestId !== routeRequestId) return;
       window.PuneRoutes.clearMapRoutes();
@@ -189,7 +200,7 @@
   document.querySelectorAll(".mode-tab").forEach((button) => {
     button.addEventListener("click", () => {
       const mode = button.dataset.mode;
-      if (!["walking", "bus", "metro", "auto"].includes(mode)) return;
+      if (!["multimodal", "walking", "bus", "metro", "auto"].includes(mode)) return;
       state.activeMode = mode;
       document.querySelectorAll(".mode-tab").forEach((tab) => {
         const active = tab === button;

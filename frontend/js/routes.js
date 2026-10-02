@@ -18,6 +18,21 @@
     return body;
   }
 
+  async function fetchCandidates(origin, destination, signal) {
+    const response = await fetch("/api/routes/multimodal", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({
+        origin: { lat: origin.lat, lng: origin.lng, label: origin.label || origin.name },
+        destination: { lat: destination.lat, lng: destination.lng, label: destination.label || destination.name },
+      }),
+      signal,
+    });
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(body.detail || "Could not build route options");
+    return Array.isArray(body) ? body : [];
+  }
+
   function clearMapRoutes() {
     if (routeLayer) routeLayer.clearLayers();
   }
@@ -31,8 +46,8 @@
       if (leg.mode === "transfer") return;
       if (!Array.isArray(leg.geometry) || leg.geometry.length < 2) return;
       let style;
-      if ((route.mode === "bus" || route.mode === "metro") && leg.mode === "walking") {
-        style = { color: "#888f89", weight: 4, opacity: 0.9, dashArray: "7 8", lineCap: "round", lineJoin: "round" };
+      if ((route.mode === "multimodal" || route.mode === "bus" || route.mode === "metro") && leg.mode === "walking") {
+        style = { color: "#858b84", weight: 4, opacity: 0.95, dashArray: "7 8", lineCap: "round", lineJoin: "round" };
       } else if (leg.mode === "bus") {
         style = { color: "#397eae", weight: 5, opacity: 0.95, lineCap: "round", lineJoin: "round" };
       } else if (leg.mode === "metro") {
@@ -175,6 +190,116 @@
     container.hidden = false;
   }
 
+  function formatDistance(km) {
+    return km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1)} km`;
+  }
+
+  function stageForLeg(leg) {
+    if (leg.mode === "walking") return { icon: "🚶", text: "Walk", color: "#858b84" };
+    if (leg.mode === "auto") {
+      const endpoints = leg.from_label && leg.to_label ? ` · ${leg.from_label} → ${leg.to_label}` : "";
+      return { icon: "🛺", text: `Auto-rickshaw${endpoints}`, color: "#E65100" };
+    }
+    if (leg.mode === "bus") return { icon: "🚌", text: leg.route_name || "PMPML bus", color: "#397eae" };
+    if (leg.mode === "metro") return { icon: "🚇", text: leg.line_name || "Metro", color: leg.line_color || "#008B8B" };
+    if (leg.mode === "transfer") return { icon: "⇄", text: `Transfer${leg.transfer_station?.name ? ` at ${leg.transfer_station.name}` : ""}`, color: "#777" };
+    return { icon: "•", text: leg.mode, color: "#777" };
+  }
+
+  function renderCandidates(routes, container, onSelect) {
+    container.replaceChildren();
+    const title = document.createElement("h2");
+    title.className = "route-summary-title";
+    title.textContent = "All route options";
+    const kicker = document.createElement("p");
+    kicker.className = "route-summary-kicker";
+    kicker.textContent = `${routes.length} journeys · compare time, fare & emissions`;
+    container.append(kicker, title);
+    if (!routes.length) {
+      const empty = document.createElement("p");
+      empty.className = "candidate-empty";
+      empty.textContent = "No route options could be assembled for these places.";
+      container.append(empty);
+      container.hidden = false;
+      return;
+    }
+    const list = document.createElement("div");
+    list.className = "candidate-list";
+    routes.forEach((route, index) => {
+      const card = document.createElement("article");
+      card.className = `candidate-card${index === 0 ? " is-selected" : ""}`;
+      card.setAttribute("aria-pressed", String(index === 0));
+      card.setAttribute("role", "button");
+      card.tabIndex = 0;
+      const heading = document.createElement("div");
+      heading.className = "candidate-card-heading";
+      const name = document.createElement("h3");
+      name.className = "candidate-title";
+      name.textContent = route.candidate_name || route.candidate_id || "Journey option";
+      const badge = document.createElement("span");
+      badge.className = "candidate-badge";
+      badge.textContent = index === 0 ? "Fastest" : `${route.transfers_count || 0} transfers`;
+      heading.append(name, badge);
+      const metrics = document.createElement("div");
+      metrics.className = "candidate-metrics";
+      [
+        ["Time", `${Math.round(route.total_duration_min || 0)} min`],
+        ["Fare", `₹${Number(route.total_fare_inr || 0).toFixed(0)}`],
+        ["Distance", formatDistance(Number(route.total_distance_km || 0))],
+        ["CO₂", `${Math.round(route.total_co2_grams || 0)} g`],
+      ].forEach(([label, value]) => {
+        const metric = document.createElement("span");
+        metric.append(`${label} `);
+        const strong = document.createElement("strong");
+        strong.textContent = value;
+        metric.append(strong);
+        metrics.append(metric);
+      });
+      const timeline = document.createElement("ol");
+      timeline.className = "candidate-timeline";
+      (route.legs || []).forEach((leg) => {
+        const stage = stageForLeg(leg);
+        const item = document.createElement("li");
+        item.className = "candidate-stage";
+        const icon = document.createElement("span");
+        icon.className = "candidate-stage-icon";
+        icon.textContent = stage.icon;
+        const description = document.createElement("span");
+        description.textContent = stage.text;
+        description.style.color = stage.color;
+        if (leg.mode === "bus" && leg.board_stop && leg.alight_stop) {
+          description.textContent += ` · ${leg.board_stop.name} → ${leg.alight_stop.name}`;
+        } else if (leg.mode === "metro" && leg.board_station && leg.alight_station) {
+          description.textContent += ` · ${leg.board_station.name} → ${leg.alight_station.name}`;
+        }
+        const distance = document.createElement("span");
+        distance.className = "candidate-stage-distance";
+        distance.textContent = leg.mode === "transfer" ? `${Math.round(leg.duration_min)} min` : formatDistance(Number(leg.distance_km || 0));
+        item.append(icon, description, distance);
+        timeline.append(item);
+      });
+      card.append(heading, metrics, timeline);
+      const selectCard = () => {
+        list.querySelectorAll(".candidate-card").forEach((other) => {
+          const active = other === card;
+          other.classList.toggle("is-selected", active);
+          other.setAttribute("aria-pressed", String(active));
+        });
+        onSelect(route);
+      };
+      card.addEventListener("click", selectCard);
+      card.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          selectCard();
+        }
+      });
+      list.append(card);
+    });
+    container.append(list);
+    container.hidden = false;
+  }
+
   function renderError(container, error, mode) {
     container.replaceChildren();
     const kicker = document.createElement("p");
@@ -190,5 +315,5 @@
     container.hidden = false;
   }
 
-  window.PuneRoutes = { fetchRoute, renderMap, renderSummary, renderError, clearMapRoutes };
+  window.PuneRoutes = { fetchRoute, fetchCandidates, renderMap, renderSummary, renderCandidates, renderError, clearMapRoutes };
 })();

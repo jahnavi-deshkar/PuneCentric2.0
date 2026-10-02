@@ -3,12 +3,19 @@
 from fastapi import APIRouter, HTTPException, Query
 
 from app.models.route import RouteRequest, RouteResponse
+from app.routing.multimodal import multimodal_router
 from app.transport.bus import bus_router
 from app.transport.auto import auto_router
 from app.transport.metro import metro_router
 from app.transport.walking import walking_router
 
 router = APIRouter()
+
+
+@router.post("/routes/multimodal", response_model=list[RouteResponse])
+def multimodal_route(request: RouteRequest) -> list[RouteResponse]:
+    """Return ranked walking, auto, bus, metro, and composite route choices."""
+    return multimodal_router.route(request)
 
 
 @router.post("/routes/walking", response_model=RouteResponse)

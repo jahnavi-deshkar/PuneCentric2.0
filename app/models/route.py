@@ -44,6 +44,8 @@ class RouteLeg(BaseModel):
     fare_rate_per_km: float | None = Field(default=None, ge=0)
     night_surcharge_applied: bool = False
     fare_currency: str | None = None
+    from_label: str | None = None
+    to_label: str | None = None
 
 
 class RouteResponse(BaseModel):
@@ -53,3 +55,7 @@ class RouteResponse(BaseModel):
     total_fare_inr: float = Field(ge=0)
     total_co2_grams: float = Field(ge=0)
     legs: list[RouteLeg]
+    candidate_id: str | None = None
+    candidate_name: str | None = None
+    transfers_count: int = Field(default=0, ge=0)
+    walk_distance_km: float = Field(default=0, ge=0)
